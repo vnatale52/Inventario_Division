@@ -1,7 +1,12 @@
 import axios from 'axios';
 
+// MODIFICAR ESTA LÍNEA: Cambiar de:
+//   baseURL: 'http://localhost:3001/api',   // sólo para localhost
+// A:
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
 const api = axios.create({
-    baseURL: 'http://localhost:3001/api',
+    baseURL: `${API_BASE_URL}/api`,
 });
 
 export const fetchData = async () => {
