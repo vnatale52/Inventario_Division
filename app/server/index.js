@@ -5,7 +5,8 @@ const path = require('path');
 const csv = require('csv-parser');
 
 const app = express();
-const PORT = 3001;
+// const PORT = 3001;    // sólo para localhost
+const PORT = process.env.PORT || 3001;    // variable de entorno para Render.com
 
 app.use(cors());
 app.use(express.json());
