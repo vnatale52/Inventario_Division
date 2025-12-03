@@ -6,6 +6,7 @@ services:
     rootDir: app/server
     buildCommand: npm install
     startCommand: node index.js
+    plan: free
     envVars:
       - key: DATABASE_URL
         fromDatabase:
