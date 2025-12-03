@@ -315,7 +315,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                 <table className="w-full text-sm text-left border-collapse table-fixed">
                     <thead className="text-xs text-white uppercase bg-slate-700 sticky top-0 z-10">
                         <tr className="relative">
-                            <th className="px-2 font-medium border border-zinc-700 bg-slate-700 w-[80px] min-w-[80px] max-w-[80px] relative group" style={{ height: `${headerHeight}px` }}>
+                            <th className="px-2 font-medium border-2 border-slate-400 bg-slate-700 w-[80px] min-w-[80px] max-w-[80px] relative group" style={{ height: `${headerHeight}px` }}>
                                 Actions
                                 {/* Column width resize handle */}
                                 <div
@@ -338,7 +338,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                             {safeColumns.map((col, index) => (
                                 <th
                                     key={`col-${col.id}-${index}`}
-                                    className="px-4 font-medium border border-zinc-700 relative group bg-slate-700"
+                                    className="px-4 font-medium border-2 border-slate-400 relative group bg-slate-700"
                                     style={{ width: columnWidths[col.label] || getInitialWidth(col.label), minWidth: columnWidths[col.label] || getInitialWidth(col.label), height: `${headerHeight}px` }}
                                     title={col.label}
                                 >
