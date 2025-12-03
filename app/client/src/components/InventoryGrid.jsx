@@ -152,12 +152,14 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
     }, [columnWidths, role]);
 
     const startHeaderResizing = useCallback((e) => {
+        console.log('startHeaderResizing called', e);
         e.preventDefault();
         e.stopPropagation();
         headerResizingRef.current = {
             startY: e.clientY,
             startHeight: headerHeight
         };
+        console.log('Header resize started:', headerResizingRef.current);
 
         const onMouseMove = (moveEvent) => {
             if (headerResizingRef.current) {
@@ -301,7 +303,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                 <table className="w-full text-sm text-left border-collapse table-fixed">
                     <thead className="text-xs text-zinc-400 uppercase bg-zinc-950/90 sticky top-0 z-10">
                         <tr className="relative">
-                            <th className="px-4 font-medium border border-zinc-700 bg-zinc-900 w-[100px] min-w-[100px] relative group" style={{ height: `${headerHeight}px` }}>
+                            <th className="px-4 font-medium border border-zinc-700 bg-zinc-900 w-[80px] min-w-[80px] relative group" style={{ height: `${headerHeight}px` }}>
                                 Actions
                                 {/* Column width resize handle */}
                                 <div
