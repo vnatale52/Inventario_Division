@@ -1,8 +1,5 @@
 import axios from 'axios';
 
-// MODIFICAR ESTA LÍNEA: Cambiar de:
-//   baseURL: 'http://localhost:3001/api',   // sólo para localhost
-// A:
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 const api = axios.create({
@@ -44,6 +41,6 @@ export const updateColumns = async (type, column) => {
 };
 
 export const createBackup = async (username) => {
-    const response = await api.post('/backup', { username });
-    return response.data;
+    const response = await api.post('/backup', { username }, { responseType: 'blob' });
+    return response;
 };

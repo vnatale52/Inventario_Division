@@ -170,8 +170,6 @@ Inventory System
 
 // Backup endpoint (Updated for Postgres)
 app.post('/api/backup', authenticateToken, async (req, res) => {
-    // Note: Real Postgres backup should be done via pg_dump on the system level.
-    // This endpoint now just dumps the JSON data as a CSV for user convenience.
     try {
         const { username } = req.body;
 
@@ -182,9 +180,9 @@ app.post('/api/backup', authenticateToken, async (req, res) => {
         const columnsData = columnsRes.rows;
         const inventoryData = inventoryRes.rows.map(r => r.data);
 
-        // Generate CSV content (reuse logic)
+        // Generate CSV content
         const headers = columnsData.map(c => c.label);
-        const seqLine = columnsData.map(c => c.column_id).join(';'); // Use column_id instead of id if different
+        const seqLine = columnsData.map(c => c.column_id).join(';');
         const headerLine = headers.join(';');
 
         const lines = [seqLine, headerLine];
@@ -195,23 +193,13 @@ app.post('/api/backup', authenticateToken, async (req, res) => {
 
         const csvContent = lines.join('\n');
 
-        // Save to backups folder
-        const fs = require('fs');
-        const path = require('path');
-        const DATA_DIR = path.join(__dirname, '../../');
-        const backupDir = path.join(DATA_DIR, 'backups');
-
-        if (!fs.existsSync(backupDir)) {
-            fs.mkdirSync(backupDir, { recursive: true });
-        }
-
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
         const filename = `${username}_backup_${timestamp}.csv`;
-        const filePath = path.join(backupDir, filename);
 
-        fs.writeFileSync(filePath, csvContent, 'latin1');
-
-        res.json({ success: true, file: filename });
+        // Send as download
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        res.send(csvContent);
 
     } catch (error) {
         console.error('Backup error:', error);

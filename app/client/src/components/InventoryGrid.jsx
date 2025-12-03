@@ -75,7 +75,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
 
     // Column resizing state
     const [columnWidths, setColumnWidths] = useState({});
-    const [headerHeight, setHeaderHeight] = useState(62); // Default height reduced by 35% (was 96px, now 62px)
+    const [headerHeight, setHeaderHeight] = useState(48); // Default height reduced to 50% (was 96px, now 48px)
     const resizingRef = useRef(null);
     const headerResizingRef = useRef(null);
 
@@ -302,7 +302,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                                     title={col.label}
                                 >
                                     <div className="flex flex-col gap-0.5">
-                                        <span className="font-semibold text-zinc-200 text-xs break-words">{col.label}</span>
+                                        <span className="font-semibold text-zinc-200 text-[11px] break-words">{col.label}</span>
                                         {col.type && <span className="text-[10px] text-zinc-500 font-normal break-words">{col.type}</span>}
                                     </div>
                                     {/* Resize handle */}
