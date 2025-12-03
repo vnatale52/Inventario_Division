@@ -75,7 +75,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
 
     // Column resizing state
     const [columnWidths, setColumnWidths] = useState({});
-    const [headerHeight, setHeaderHeight] = useState(48); // Default height reduced to 50% (was 96px, now 48px)
+    const [headerHeight, setHeaderHeight] = useState(24); // Default height reduced to 50% of previous (was 48px, now 24px)
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
     const resizingRef = useRef(null);
     const headerResizingRef = useRef(null);
@@ -114,7 +114,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
             try {
                 setHeaderHeight(parseInt(savedHeaderHeight, 10));
             } catch (e) {
-                setHeaderHeight(48);
+                setHeaderHeight(24);
             }
         }
     }, [columns.length, role]); // Only depend on columns.length, not the array itself
@@ -162,7 +162,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
         const onMouseMove = (moveEvent) => {
             if (headerResizingRef.current) {
                 const diff = moveEvent.clientY - headerResizingRef.current.startY;
-                const newHeight = Math.max(40, headerResizingRef.current.startHeight + diff); // Min height 40px
+                const newHeight = Math.max(20, headerResizingRef.current.startHeight + diff); // Min height 20px
                 setHeaderHeight(newHeight);
                 setHasUnsavedChanges(true);
             }
@@ -297,7 +297,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                 </div>
             </div>
 
-            <div className="overflow-x-auto max-h-[calc(100vh-250px)] border-t border-zinc-700" style={{ scrollbarWidth: 'thin' }}>
+            <div className="overflow-x-auto max-h-[calc(100vh-200px)] border-t border-zinc-700" style={{ scrollbarWidth: 'thin' }}>
                 <table className="w-full text-sm text-left border-collapse table-fixed">
                     <thead className="text-xs text-zinc-400 uppercase bg-zinc-950/90 sticky top-0 z-10">
                         <tr className="relative">
@@ -320,17 +320,17 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                                         className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-primary-500 opacity-0 group-hover:opacity-100 transition-opacity"
                                         onMouseDown={(e) => startResizing(e, col.label)}
                                     />
+                                    {/* Header height resize handle - only on last column */}
+                                    {index === safeColumns.length - 1 && (
+                                        <div
+                                            className="absolute left-0 right-0 cursor-row-resize hover:bg-green-500 z-30 bg-green-500/40"
+                                            style={{ bottom: '-2px', height: '6px' }}
+                                            onMouseDown={startHeaderResizing}
+                                            title="Drag to resize header height"
+                                        />
+                                    )}
                                 </th>
                             ))}
-                            {/* Header row resize handle */}
-                            <th colSpan={safeColumns.length + 1} className="p-0 border-0 relative" style={{ height: '0px', padding: '0' }}>
-                                <div
-                                    className="absolute left-0 right-0 cursor-row-resize hover:bg-primary-500 z-30 bg-primary-500/30"
-                                    style={{ bottom: '-2px', height: '4px' }}
-                                    onMouseDown={startHeaderResizing}
-                                    title="Drag to resize header height"
-                                />
-                            </th>
                         </tr>
 
                     </thead>
