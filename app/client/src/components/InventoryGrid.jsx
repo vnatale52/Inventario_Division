@@ -320,15 +320,16 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                                         className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-primary-500 opacity-0 group-hover:opacity-100 transition-opacity"
                                         onMouseDown={(e) => startResizing(e, col.label)}
                                     />
-                                    {/* Header height resize handle - only on last column */}
-                                    {index === safeColumns.length - 1 && (
-                                        <div
-                                            className="absolute left-0 right-0 cursor-row-resize hover:bg-green-500 z-30 bg-green-500/40"
-                                            style={{ bottom: '-2px', height: '6px' }}
-                                            onMouseDown={startHeaderResizing}
-                                            title="Drag to resize header height"
-                                        />
-                                    )}
+                                    {/* Header height resize handle - visible on all columns */}
+                                    <div
+                                        className="absolute left-0 right-0 cursor-row-resize hover:bg-green-500 z-40 bg-green-500/40"
+                                        style={{ bottom: '-2px', height: '6px' }}
+                                        onMouseDown={(e) => {
+                                            e.stopPropagation();
+                                            startHeaderResizing(e);
+                                        }}
+                                        title="Drag to resize header height"
+                                    />
                                 </th>
                             ))}
                         </tr>
