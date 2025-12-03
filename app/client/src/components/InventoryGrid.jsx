@@ -174,7 +174,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
         const onMouseMove = (moveEvent) => {
             if (headerResizingRef.current) {
                 const diff = moveEvent.clientY - headerResizingRef.current.startY;
-                const newHeight = Math.max(20, headerResizingRef.current.startHeight + diff);
+                const newHeight = Math.max(10, headerResizingRef.current.startHeight + diff); // Min height reduced to 10px
                 console.log('Moving:', { diff, newHeight });
                 setHeaderHeight(newHeight);
                 setHasUnsavedChanges(true);
@@ -313,9 +313,9 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
 
             <div className="overflow-x-auto max-h-[calc(100vh-200px)] border-t border-zinc-700" style={{ scrollbarWidth: 'thin' }}>
                 <table className="w-full text-sm text-left border-collapse table-fixed">
-                    <thead className="text-xs text-zinc-400 uppercase bg-zinc-950/90 sticky top-0 z-10">
+                    <thead className="text-xs text-zinc-300 uppercase bg-zinc-800 sticky top-0 z-10">
                         <tr className="relative">
-                            <th className="px-4 font-medium border border-zinc-700 bg-zinc-900 w-[80px] min-w-[80px] relative group" style={{ height: `${headerHeight}px` }}>
+                            <th className="px-2 font-medium border border-zinc-700 bg-zinc-800 w-[80px] min-w-[80px] max-w-[80px] relative group" style={{ height: `${headerHeight}px` }}>
                                 Actions
                                 {/* Column width resize handle */}
                                 <div
@@ -338,7 +338,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                             {safeColumns.map((col, index) => (
                                 <th
                                     key={`col-${col.id}-${index}`}
-                                    className="px-4 font-medium border border-zinc-700 relative group"
+                                    className="px-4 font-medium border border-zinc-700 relative group bg-zinc-800"
                                     style={{ width: columnWidths[col.label] || getInitialWidth(col.label), minWidth: columnWidths[col.label] || getInitialWidth(col.label), height: `${headerHeight}px` }}
                                     title={col.label}
                                 >
