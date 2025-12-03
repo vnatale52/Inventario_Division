@@ -111,7 +111,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
             try {
                 setHeaderHeight(parseInt(savedHeaderHeight, 10));
             } catch (e) {
-                setHeaderHeight(96);
+                setHeaderHeight(48);
             }
         }
     }, [safeColumns, role]);
@@ -168,7 +168,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
         const onMouseMove = (moveEvent) => {
             if (headerResizingRef.current) {
                 const diff = moveEvent.clientY - headerResizingRef.current.startY;
-                const newHeight = Math.max(60, headerResizingRef.current.startHeight + diff); // Min height 60px
+                const newHeight = Math.max(40, headerResizingRef.current.startHeight + diff); // Min height 40px
                 setHeaderHeight(newHeight);
             }
         };
