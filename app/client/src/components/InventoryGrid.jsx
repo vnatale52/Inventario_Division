@@ -301,8 +301,15 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                 <table className="w-full text-sm text-left border-collapse table-fixed">
                     <thead className="text-xs text-zinc-400 uppercase bg-zinc-950/90 sticky top-0 z-10">
                         <tr className="relative">
-                            <th className="px-4 font-medium border border-zinc-700 bg-zinc-900 w-[100px] min-w-[100px]" style={{ height: `${headerHeight}px` }}>
+                            <th className="px-4 font-medium border border-zinc-700 bg-zinc-900 w-[100px] min-w-[100px] relative" style={{ height: `${headerHeight}px` }}>
                                 Actions
+                                {/* Header height resize handle */}
+                                <div
+                                    className="absolute left-0 right-0 cursor-row-resize hover:bg-green-500 z-40 bg-green-500/40"
+                                    style={{ bottom: '-2px', height: '6px' }}
+                                    onMouseDown={startHeaderResizing}
+                                    title="Drag to resize header height"
+                                />
                             </th>
                             {safeColumns.map((col, index) => (
                                 <th
@@ -324,10 +331,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                                     <div
                                         className="absolute left-0 right-0 cursor-row-resize hover:bg-green-500 z-40 bg-green-500/40"
                                         style={{ bottom: '-2px', height: '6px' }}
-                                        onMouseDown={(e) => {
-                                            e.stopPropagation();
-                                            startHeaderResizing(e);
-                                        }}
+                                        onMouseDown={startHeaderResizing}
                                         title="Drag to resize header height"
                                     />
                                 </th>
