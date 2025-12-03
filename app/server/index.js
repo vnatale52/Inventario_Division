@@ -193,8 +193,10 @@ app.post('/api/backup', authenticateToken, async (req, res) => {
 
         const csvContent = lines.join('\n');
 
-        // Generate timestamp in Argentina timezone (UTC-3)
-        const argentinaDate = new Date().toLocaleString('es-AR', {
+        // Generate timestamp in Argentina timezone (UTC-3) manually
+        const now = new Date();
+        const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+        const argentinaTime = new Date(utc - (3600000 * 3)); // UTC-3
             timeZone: 'America/Argentina/Buenos_Aires',
             year: 'numeric',
             month: '2-digit',
