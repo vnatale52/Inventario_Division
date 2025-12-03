@@ -363,19 +363,19 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                         </tr>
 
                     </thead>
-                    <tbody className="bg-zinc-900">
+                    <tbody className="bg-slate-50">
                         {isAdding && (
                             <tr className="bg-primary-900/10">
-                                <td className="px-4 py-3 border border-zinc-700 bg-zinc-900 sticky left-0 z-10">
+                                <td className="px-4 py-3 border border-slate-300 bg-white">
                                     <div className="flex gap-2">
                                         <button onClick={handleSave} className="text-green-400 hover:text-green-300"><Save size={18} /></button>
                                         <button onClick={handleCancel} className="text-red-400 hover:text-red-300"><X size={18} /></button>
                                     </div>
                                 </td>
                                 {safeColumns.map((col, index) => (
-                                    <td key={`add-${col.id}-${index}`} className="px-4 py-3 border border-zinc-700 overflow-hidden">
+                                    <td key={`add-${col.id}-${index}`} className="px-4 py-3 border border-slate-300 overflow-hidden">
                                         <input
-                                            className="bg-zinc-800 border-zinc-700 rounded px-2 py-1 w-full text-white text-xs focus:outline-none focus:border-primary-500"
+                                            className="bg-white border border-slate-300 rounded px-2 py-1 w-full text-gray-900 text-xs focus:outline-none focus:border-blue-500"
                                             value={editForm[col.label] || ''}
                                             onChange={(e) => handleChange(col.label, e.target.value)}
                                             placeholder={col.label}
@@ -388,8 +388,8 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                         {safeData.map((row, rowIndex) => {
                             const isEditing = editingId === row._id;
                             return (
-                                <tr key={`row-${row._id}-${rowIndex}`} className={clsx("hover:bg-zinc-800/50 transition-colors", isEditing && "bg-zinc-800/80")}>
-                                    <td className="px-4 py-3 border border-zinc-700 bg-zinc-900">
+                                <tr key={`row-${row._id}-${rowIndex}`} className={clsx("hover:bg-blue-100 transition-colors", isEditing && "bg-blue-50")}>
+                                    <td className="px-4 py-3 border border-slate-300 bg-slate-50">
                                         <div className="flex gap-2">
                                             {isEditing ? (
                                                 <>
@@ -413,11 +413,11 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                                         }
 
                                         return (
-                                            <td key={`cell-${row._id}-${col.id}-${colIndex}`} className={clsx("px-4 py-3 whitespace-nowrap border border-zinc-700 overflow-hidden", isFinancialColumn(col.label) && "text-right")}>
+                                            <td key={`cell-${row._id}-${col.id}-${colIndex}`} className={clsx("px-4 py-3 whitespace-nowrap border border-slate-300 overflow-hidden", isFinancialColumn(col.label) && "text-right")}>
                                                 {isEditing ? (
                                                     col.label === 'Orden' ? (
                                                         // Display read-only order number in edit mode
-                                                        <span className="text-zinc-300 text-xs truncate block" title={val}>
+                                                        <span className="text-gray-700 text-xs truncate block" title={val}>
                                                             {val}
                                                         </span>
                                                     ) : (
