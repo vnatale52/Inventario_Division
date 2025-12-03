@@ -1,0 +1,42 @@
+
+#  He creado un archivo render.yaml en la raíz de tu proyecto. Este archivo le dice a Render exactamente cómo configurar el Backend, el Frontend y la Base de Datos automáticamente.
+
+services:
+  # Backend Service
+  - type: web
+    name: inventory-backend
+    env: node
+    rootDir: app/server
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: inventory-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+
+  # Frontend Service
+  - type: web
+    name: inventory-frontend
+    env: static
+    rootDir: app/client
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: inventory-backend
+          property: url
+
+databases:
+  - name: inventory-db
+    databaseName: inventario_db
+    user: inventory_user
+    plan: free # Optional: explicitly request free tier if available

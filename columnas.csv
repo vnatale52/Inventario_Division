@@ -1,0 +1,85 @@
+Número Columna;Descripción
+1;Orden
+2;Mes
+3;Año
+4;DIR
+5;DPTO
+6;DIV
+7;SECT
+8;INSPECTOR
+9;SUPERVISOR
+10;REVISOR DIV
+11;JEFE DIV
+12;REVISOR DEPTO
+13;REVISOR DIREC
+14;RAZON SOCIAL
+15;CARGO
+16;AÑO CARGO
+17;EXPTE
+18;AÑO EXPTE
+19;CUIT
+20;CATEG CONTR
+21;NRO INSCRIP
+22;JURISD CM
+23;FECHA INICIO
+24;FECHA RECEPCION
+25;PLAN
+26;PERIODO A VERIFICAR
+27;DV
+28;TR
+29;DOMICILIO INSPECCION (CALLE Y NUMERO)
+30;DOMICILIO INSPECCION (PROVINCIA)
+31;ACTIVIDAD PRINCIPAL DETECTADA - LEY TARIFARIA
+32;ALICUOTA - LEY TARIFARIA
+33;AGRUPADOR DE ACTIVIDAD
+34;ORIGEN DEL CARGO
+35;ESTADO DE LA ACTUACION
+36;CONCEPTO DEL AJUSTE/MOTIVO DE DESCARGO
+37;FECHA DESCARGO
+38;DESTINO
+39;Cargo nuevo del mes actual
+40;Ingresa como DV/TR del mes actual
+41;Queda stock mes actual
+42;Descargo del mes actual
+43;NOTAS
+44;FECHA ULTIMA ACTA
+45;MAIL (cargos iniciados)
+46;Dif. canceladas en un pago - Impuesto
+47;Dif. canceladas en un pago - Accesorios
+48;Pago en Curso Rectif. - Impuesto
+49;Pago en Curso Rectif. - Accesorios
+50;Plan de facilidades - Impuesto
+51;Plan de facilidades  - Accesorios
+52;Plan de facilidades - cantidad
+53;Multa reducida - Impuesto
+54;Multa reducida - Accesorios
+55;Multa reducida - cantidad
+56;BD - Dif. de al¡cuota - Impuesto
+57;BD - Dif. de al¡cuota - Accesorios
+58;BD - Desc. improc. - Impuesto
+59;BD - Desc. improc. - Accesorios
+60;BD - Dif. acept. no abonada - Impuesto
+61;BD - Dif. acept. no abonada - Accesorios
+62;BD - Deuda concursal falencial - Impuesto
+63;BD - Deuda concursal falencial - Accesorios
+64;ISIB Dif. no conformadas - Impuesto
+65;ISIB Dif. no conformadas - Accesorios
+66;Sellos Pago en curso - Impuesto
+67;Sellos pago en curso - Accesorios
+68;Sellos BD - Impuesto
+69;Sellos BD - Accesorios
+70;Sellos Plan de facilid. - Impuesto
+71;Sellos Plan de facilid. - Accesorios
+72;Sellos Plan de facilid. - cantidad
+73;Sellos Dif. no conformadas - Impuesto
+74;Sellos Dif. no conformadas - Accesorios
+75;Empadron. Pago en curso - Impuesto
+76;Empadron. Pago en curso - Accesorios
+77;Empadronados BD - Impuesto
+78;Empadronados BD - Accesorios
+79;Total Dif. conformadas - Impuesto
+80;Total Dif. conformadas - Accesorios
+81;Total Dif. NO conformadas - Impuesto
+82;Total Dif. NO conformadas - Accesorios
+83;Recaudación Total
+84;Recaudación Nominal

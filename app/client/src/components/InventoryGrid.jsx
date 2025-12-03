@@ -1,0 +1,408 @@
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Plus, Trash2, Save, X, Mail, Settings } from 'lucide-react';
+import clsx from 'clsx';
+import { ColumnManager } from './ColumnManager';
+import axios from 'axios';
+
+// Helper to determine initial width based on column name
+const getInitialWidth = (label) => {
+    // Small columns: ~5 characters width (50px - reduced)
+    const smallColumns = [
+        'Mes', 'Año', 'Orden', 'DIR', 'DPTO', 'DIV', 'SECT', 'CARGO',
+        'AÑO CARGO', 'AÑO EXPTE', 'CATEG CONTR', 'DV', 'TR',
+        'Cargo nuevo del mes actual', 'Ingresa como DV/TR del mes actual',
+        'Queda stock mes actual', 'Descargo del mes actual'
+    ];
+
+    // Medium columns: ~14 characters width (120px - reduced)
+    const mediumColumns = [
+        'Dif. canceladas en un pago - Impuesto', 'Dif. canceladas en un pago - Accesorios',
+        'Pago en Curso Rectif. - Impuesto', 'Pago en Curso Rectif. - Accesorios',
+        'Plan de facilidades - Impuesto', 'Plan de facilidades - Accesorios', 'Plan de facilidades - cantidad',
+        'Multa reducida - Impuesto', 'Multa reducida - Accesorios', 'Multa reducida - cantidad',
+        'BD - Dif. de al¡cuota - Impuesto', 'BD - Dif. de al¡cuota - Accesorios',
+        'BD - Desc. improc. - Impuesto', 'BD - Desc. improc. - Accesorios',
+        'BD - Dif. acept. no abonada - Impuesto', 'BD - Dif. acept. no abonada - Accesorios',
+        'BD - Deuda concursal falencial - Impuesto', 'BD - Deuda concursal falencial - Accesorios',
+        'ISIB Dif. no conformadas - Impuesto', 'ISIB Dif. no conformadas - Accesorios',
+        'Sellos Pago en curso - Impuesto', 'Sellos pago en curso - Accesorios',
+        'Sellos BD - Impuesto', 'Sellos BD - Accesorios',
+        'Sellos Plan de facilid. - Impuesto', 'Sellos Plan de facilid. - Accesorios', 'Sellos Plan de facilid. - cantidad',
+        'Sellos Dif. no conformadas - Impuesto', 'Sellos Dif. no conformadas - Accesorios',
+        'Empadron. Pago en curso - Impuesto', 'Empadron. Pago en curso - Accesorios',
+        'Empadronados BD - Impuesto', 'Empadronados BD - Accesorios',
+        'Total Dif. conformadas - Impuesto', 'Total Dif. conformadas - Accesorios',
+        'Total Dif. NO conformadas - Impuesto', 'Total Dif. NO conformadas - Accesorios',
+        'Recaudación Total', 'Recaudación Nominal'
+    ];
+
+    // Use exact matching instead of includes() to prevent false matches
+    if (smallColumns.includes(label)) return 50;
+    if (mediumColumns.includes(label)) return 120;
+    return 150; // Default width for other columns
+};
+
+// Helper to determine if column should be left-aligned (financial columns)
+const isFinancialColumn = (label) => {
+    const financialColumns = [
+        'Dif. canceladas en un pago - Impuesto', 'Dif. canceladas en un pago - Accesorios',
+        'Pago en Curso Rectif. - Impuesto', 'Pago en Curso Rectif. - Accesorios',
+        'Plan de facilidades - Impuesto', 'Plan de facilidades - Accesorios', 'Plan de facilidades - cantidad',
+        'Multa reducida - Impuesto', 'Multa reducida - Accesorios', 'Multa reducida - cantidad',
+        'BD - Dif. de al¡cuota - Impuesto', 'BD - Dif. de al¡cuota - Accesorios',
+        'BD - Desc. improc. - Impuesto', 'BD - Desc. improc. - Accesorios',
+        'BD - Dif. acept. no abonada - Impuesto', 'BD - Dif. acept. no abonada - Accesorios',
+        'BD - Deuda concursal falencial - Impuesto', 'BD - Deuda concursal falencial - Accesorios',
+        'ISIB Dif. no conformadas - Impuesto', 'ISIB Dif. no conformadas - Accesorios',
+        'Sellos Pago en curso - Impuesto', 'Sellos pago en curso - Accesorios',
+        'Sellos BD - Impuesto', 'Sellos BD - Accesorios',
+        'Sellos Plan de facilid. - Impuesto', 'Sellos Plan de facilid. - Accesorios', 'Sellos Plan de facilid. - cantidad',
+        'Sellos Dif. no conformadas - Impuesto', 'Sellos Dif. no conformadas - Accesorios',
+        'Empadron. Pago en curso - Impuesto', 'Empadron. Pago en curso - Accesorios',
+        'Empadronados BD - Impuesto', 'Empadronados BD - Accesorios',
+        'Total Dif. conformadas - Impuesto', 'Total Dif. conformadas - Accesorios',
+        'Total Dif. NO conformadas - Impuesto', 'Total Dif. NO conformadas - Accesorios',
+        'Recaudación Total', 'Recaudación Nominal'
+    ];
+    return financialColumns.includes(label);
+};
+
+export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
+    const [editingId, setEditingId] = useState(null);
+    const [editForm, setEditForm] = useState({});
+    const [isAdding, setIsAdding] = useState(false);
+    const [showColManager, setShowColManager] = useState(false);
+
+    // Column resizing state
+    const [columnWidths, setColumnWidths] = useState({});
+    const [headerHeight, setHeaderHeight] = useState(62); // Default height reduced by 35% (was 96px, now 62px)
+    const resizingRef = useRef(null);
+    const headerResizingRef = useRef(null);
+
+    // Safety checks - force new array instances
+    const safeData = Array.isArray(data) ? [...data].filter(Boolean) : [];
+    const safeColumns = Array.isArray(columns) ? [...columns].filter(Boolean) : [];
+
+    // Initialize column widths from localStorage or defaults
+    useEffect(() => {
+        const storageKey = `inventory-column-widths-${role}`;
+        const savedWidths = localStorage.getItem(storageKey);
+
+        const initialWidths = {};
+        safeColumns.forEach(col => {
+            initialWidths[col.label] = getInitialWidth(col.label);
+        });
+
+        if (savedWidths) {
+            try {
+                const parsed = JSON.parse(savedWidths);
+                setColumnWidths({ ...initialWidths, ...parsed });
+            } catch (e) {
+                setColumnWidths(initialWidths);
+            }
+        } else {
+            setColumnWidths(initialWidths);
+        }
+
+        // Load header height from localStorage
+        const headerHeightKey = `inventory-header-height-${role}`;
+        const savedHeaderHeight = localStorage.getItem(headerHeightKey);
+        if (savedHeaderHeight) {
+            try {
+                setHeaderHeight(parseInt(savedHeaderHeight, 10));
+            } catch (e) {
+                setHeaderHeight(96);
+            }
+        }
+    }, [safeColumns, role]);
+
+    const startResizing = useCallback((e, colLabel) => {
+        e.preventDefault();
+        resizingRef.current = {
+            label: colLabel,
+            startX: e.clientX,
+            startWidth: columnWidths[colLabel] || getInitialWidth(colLabel)
+        };
+
+        const onMouseMove = (moveEvent) => {
+            if (resizingRef.current) {
+                const diff = moveEvent.clientX - resizingRef.current.startX;
+                const newWidth = Math.max(40, resizingRef.current.startWidth + diff); // Min width 40px
+                setColumnWidths(prev => ({
+                    ...prev,
+                    [resizingRef.current.label]: newWidth
+                }));
+            }
+        };
+
+        const onMouseUp = () => {
+            if (resizingRef.current) {
+                // Save to localStorage when resizing is complete
+                const storageKey = `inventory-column-widths-${role}`;
+                const updatedWidths = {
+                    ...columnWidths,
+                    [resizingRef.current.label]: columnWidths[resizingRef.current.label]
+                };
+                localStorage.setItem(storageKey, JSON.stringify(updatedWidths));
+            }
+
+            resizingRef.current = null;
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+            document.body.style.cursor = 'default';
+        };
+
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+        document.body.style.cursor = 'col-resize';
+    }, [columnWidths, role]);
+
+    const startHeaderResizing = useCallback((e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        headerResizingRef.current = {
+            startY: e.clientY,
+            startHeight: headerHeight
+        };
+
+        const onMouseMove = (moveEvent) => {
+            if (headerResizingRef.current) {
+                const diff = moveEvent.clientY - headerResizingRef.current.startY;
+                const newHeight = Math.max(60, headerResizingRef.current.startHeight + diff); // Min height 60px
+                setHeaderHeight(newHeight);
+            }
+        };
+
+        const onMouseUp = () => {
+            if (headerResizingRef.current) {
+                // Save to localStorage when resizing is complete
+                const headerHeightKey = `inventory-header-height-${role}`;
+                localStorage.setItem(headerHeightKey, headerHeight.toString());
+            }
+
+            headerResizingRef.current = null;
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+            document.body.style.cursor = 'default';
+        };
+
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+        document.body.style.cursor = 'row-resize';
+    }, [headerHeight, role]);
+
+    const handleEdit = (row) => {
+        setEditingId(row._id);
+        setEditForm(row);
+    };
+
+    const handleCancel = () => {
+        setEditingId(null);
+        setEditForm({});
+        setIsAdding(false);
+    };
+
+    const handleSave = () => {
+        if (isAdding) {
+            onUpdate('ADD', editForm);
+        } else {
+            onUpdate('UPDATE', editForm);
+        }
+        setEditingId(null);
+        setEditForm({});
+        setIsAdding(false);
+    };
+
+    const handleDelete = (row) => {
+        if (window.confirm('Are you sure you want to delete this record?')) {
+            onUpdate('DELETE', row);
+        }
+    };
+
+    const startAdd = () => {
+        setIsAdding(true);
+        setEditingId('new');
+        setEditForm({});
+    };
+
+    const handleChange = (colLabel, value) => {
+        setEditForm(prev => ({ ...prev, [colLabel]: value }));
+    };
+
+    const handleEmail = async (row) => {
+        try {
+            const res = await axios.post('http://localhost:3001/api/email', { row });
+            const { subject, body } = res.data;
+            const mailto = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.location.href = mailto;
+        } catch (e) {
+            alert('Error generating email');
+        }
+    };
+
+    const handleColumnUpdate = async (type, col) => {
+        onUpdate('COLUMN_ADD', col);
+    };
+
+    // Helper to get value handling mismatches
+    const getValue = (row, label) => {
+        if (row[label] !== undefined) return row[label];
+
+        // Handle known mismatches/encoding issues
+        if (label === 'Mes_Año') return row['Mes'];
+        if (label === 'AÑO CARGO') return row['A¥O CARGO'] || row['AÑO CARGO'];
+        if (label === 'AÑO EXPTE') return row['A¥O EXPTE'] || row['AÑO EXPTE'];
+
+        return null;
+    };
+
+    return (
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden shadow-xl">
+            {showColManager && (
+                <ColumnManager
+                    columns={safeColumns}
+                    onClose={() => setShowColManager(false)}
+                    onUpdate={handleColumnUpdate}
+                />
+            )}
+
+            <div className="p-4 border-b border-zinc-800 flex justify-between items-center bg-zinc-900/50">
+                <h3 className="font-semibold text-lg">Records ({safeData.length})</h3>
+                <div className="flex gap-2">
+                    <button
+                        onClick={() => setShowColManager(true)}
+                        className="flex items-center gap-2 px-4 py-2 bg-teal-700 hover:bg-teal-600 text-white rounded-lg transition-colors"
+                    >
+                        <Settings size={18} />
+                        Columns
+                    </button>
+                    <button
+                        onClick={startAdd}
+                        disabled={isAdding || editingId}
+                        className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <Plus size={18} />
+                        Add Record
+                    </button>
+                </div>
+            </div>
+
+            <div className="overflow-x-auto max-h-[calc(100vh-250px)] border-t border-zinc-700" style={{ scrollbarWidth: 'thin' }}>
+                <table className="w-full text-sm text-left border-collapse table-fixed">
+                    <thead className="text-xs text-zinc-400 uppercase bg-zinc-950/90 sticky top-0 z-10">
+                        <tr className="relative">
+                            <th className="px-4 font-medium border border-zinc-700 bg-zinc-900 sticky left-0 z-20 w-[100px] min-w-[100px]" style={{ height: `${headerHeight}px` }}>
+                                Actions
+                            </th>
+                            {safeColumns.map((col, index) => (
+                                <th
+                                    key={`col-${col.id}-${index}`}
+                                    className="px-4 font-medium border border-zinc-700 relative group"
+                                    style={{ width: columnWidths[col.label] || getInitialWidth(col.label), minWidth: columnWidths[col.label] || getInitialWidth(col.label), height: `${headerHeight}px` }}
+                                    title={col.label}
+                                >
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="font-semibold text-zinc-200 text-xs break-words">{col.label}</span>
+                                        {col.type && <span className="text-[10px] text-zinc-500 font-normal break-words">{col.type}</span>}
+                                    </div>
+                                    {/* Resize handle */}
+                                    <div
+                                        className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-primary-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                                        onMouseDown={(e) => startResizing(e, col.label)}
+                                    />
+                                </th>
+                            ))}
+                        </tr>
+                        {/* Header row resize handle */}
+                        <tr className="relative h-0">
+                            <th colSpan={safeColumns.length + 1} className="p-0 border-0 relative">
+                                <div
+                                    className="absolute left-0 right-0 h-1 cursor-row-resize hover:bg-primary-500 transition-opacity z-30 bg-primary-500/20"
+                                    style={{ top: '-4px', height: '4px' }}
+                                    onMouseDown={startHeaderResizing}
+                                    title="Drag to resize header height"
+                                />
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody className="bg-zinc-900">
+                        {isAdding && (
+                            <tr className="bg-primary-900/10">
+                                <td className="px-4 py-3 border border-zinc-700 bg-zinc-900 sticky left-0 z-10">
+                                    <div className="flex gap-2">
+                                        <button onClick={handleSave} className="text-green-400 hover:text-green-300"><Save size={18} /></button>
+                                        <button onClick={handleCancel} className="text-red-400 hover:text-red-300"><X size={18} /></button>
+                                    </div>
+                                </td>
+                                {safeColumns.map((col, index) => (
+                                    <td key={`add-${col.id}-${index}`} className="px-4 py-3 border border-zinc-700 overflow-hidden">
+                                        <input
+                                            className="bg-zinc-800 border-zinc-700 rounded px-2 py-1 w-full text-white text-xs focus:outline-none focus:border-primary-500"
+                                            value={editForm[col.label] || ''}
+                                            onChange={(e) => handleChange(col.label, e.target.value)}
+                                            placeholder={col.label}
+                                        />
+                                    </td>
+                                ))}
+                            </tr>
+                        )}
+
+                        {safeData.map((row, rowIndex) => {
+                            const isEditing = editingId === row._id;
+                            return (
+                                <tr key={`row-${row._id}-${rowIndex}`} className={clsx("hover:bg-zinc-800/50 transition-colors", isEditing && "bg-zinc-800/80")}>
+                                    <td className="px-4 py-3 border border-zinc-700 bg-zinc-900 sticky left-0 z-10">
+                                        <div className="flex gap-2">
+                                            {isEditing ? (
+                                                <>
+                                                    <button onClick={handleSave} className="text-green-400 hover:text-green-300" title="Save"><Save size={16} /></button>
+                                                    <button onClick={handleCancel} className="text-red-400 hover:text-red-300" title="Cancel"><X size={16} /></button>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <button onClick={() => handleEdit(row)} className="text-primary-400 hover:text-primary-300" title="Edit"><Settings size={14} /></button>
+                                                    <button onClick={() => handleEmail(row)} className="text-blue-400 hover:text-blue-300" title="Email"><Mail size={14} /></button>
+                                                    <button onClick={() => handleDelete(row)} className="text-zinc-500 hover:text-red-400" title="Delete"><Trash2 size={14} /></button>
+                                                </>
+                                            )}
+                                        </div>
+                                    </td>
+                                    {safeColumns.map((col, colIndex) => {
+                                        // Auto-generate order number for "Orden" column
+                                        let val = getValue(row, col.label);
+                                        if (col.label === 'Orden') {
+                                            val = rowIndex + 1; // Auto-generate sequential order starting from 1
+                                        }
+
+                                        return (
+                                            <td key={`cell-${row._id}-${col.id}-${colIndex}`} className={clsx("px-4 py-3 whitespace-nowrap border border-zinc-700 overflow-hidden", isFinancialColumn(col.label) && "text-right")}>
+                                                {isEditing ? (
+                                                    col.label === 'Orden' ? (
+                                                        // Display read-only order number in edit mode
+                                                        <span className="text-zinc-300 text-xs truncate block" title={val}>
+                                                            {val}
+                                                        </span>
+                                                    ) : (
+                                                        <input
+                                                            className={clsx("bg-zinc-900 border border-zinc-700 rounded px-2 py-1 w-full text-white text-xs focus:outline-none focus:border-primary-500", isFinancialColumn(col.label) && "text-right")}
+                                                            value={editForm[col.label] || ''}
+                                                            onChange={(e) => handleChange(col.label, e.target.value)}
+                                                        />
+                                                    )
+                                                ) : (
+                                                    <span className={clsx("text-zinc-300 text-xs truncate block", isFinancialColumn(col.label) && "text-right")} title={val}>
+                                                        {val || '-'}
+                                                    </span>
+                                                )}
+                                            </td>
+                                        );
+                                    })}
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
+};
