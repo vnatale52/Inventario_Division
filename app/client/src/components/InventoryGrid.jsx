@@ -339,7 +339,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                                 <th
                                     key={`col-${col.id}-${index}`}
                                     className="px-4 font-medium border-2 border-slate-400 relative group bg-slate-700"
-                                    style={{ width: columnWidths[col.label] || getInitialWidth(col.label), minWidth: columnWidths[col.label] || getInitialWidth(col.label), height: `${headerHeight}px` }}
+                                    style={{ width: columnWidths[col.label] || getInitialWidth(col.label), minWidth: '40px', height: `${headerHeight}px` }}
                                     title={col.label}
                                 >
                                     <div className="flex flex-col gap-0.5">
@@ -388,7 +388,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                         {safeData.map((row, rowIndex) => {
                             const isEditing = editingId === row._id;
                             return (
-                                <tr key={`row-${row._id}-${rowIndex}`} className={clsx("hover:bg-blue-100 transition-colors", isEditing && "bg-blue-50")}>
+                                <tr key={`row-${row._id}-${rowIndex}`} className={clsx("hover:bg-blue-100 transition-colors odd:bg-white even:bg-slate-50", isEditing && "!bg-blue-50")}>
                                     <td className="px-4 py-3 border border-slate-300 bg-slate-50">
                                         <div className="flex gap-2">
                                             {isEditing ? (
