@@ -199,9 +199,8 @@ app.post('/api/backup', authenticateToken, async (req, res) => {
         const argentinaTime = new Date(utc - (3600000 * 3)); // UTC-3
 
         const pad = (n) => n.toString().padStart(2, '0');
-        const dateStr = `${pad(argentinaTime.getDate())}-${pad(argentinaTime.getMonth() + 1)}-${argentinaTime.getFullYear())}`;
-        const timeStr = `${pad(argentinaTime.getHours())}-${pad(argentinaTime.getMinutes())}-${pad(argentinaTime.getSeconds())}`;
-        
+        const dateStr = `${pad(argentinaTime.getDate())}-${pad(argentinaTime.getMonth() + 1)}-${argentinaTime.getFullYear()}`; const timeStr = `${pad(argentinaTime.getHours())}-${pad(argentinaTime.getMinutes())}-${pad(argentinaTime.getSeconds())}`;
+
         const filename = `${username}_backup_${dateStr}_${timeStr}.csv`;
 
         // Send as download
