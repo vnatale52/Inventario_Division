@@ -363,10 +363,10 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                         </tr>
 
                     </thead>
-                    <tbody className="bg-slate-300">
+                    <tbody className="bg-slate-400">
                         {isAdding && (
                             <tr className="bg-primary-900/10">
-                                <td className="px-4 py-3 border border-slate-500 bg-slate-200">
+                                <td className="px-4 py-3 border border-slate-500 bg-slate-300">
                                     <div className="flex gap-2">
                                         <button onClick={handleSave} className="text-green-400 hover:text-green-300"><Save size={18} /></button>
                                         <button onClick={handleCancel} className="text-red-400 hover:text-red-300"><X size={18} /></button>
@@ -388,7 +388,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                         {safeData.map((row, rowIndex) => {
                             const isEditing = editingId === row._id;
                             return (
-                                <tr key={`row-${row._id}-${rowIndex}`} className={clsx("hover:bg-blue-300 transition-colors odd:bg-slate-200 even:bg-slate-300", isEditing && "!bg-blue-200")}>
+                                <tr key={`row-${row._id}-${rowIndex}`} className={clsx("hover:bg-blue-400 transition-colors odd:bg-slate-300 even:bg-slate-400", isEditing && "!bg-blue-300")}>
                                     <td className="px-4 py-3 border border-slate-500 bg-transparent">
                                         <div className="flex gap-2">
                                             {isEditing ? (
@@ -422,7 +422,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                                                         </span>
                                                     ) : (
                                                         <input
-                                                            className={clsx("bg-white border border-slate-500 rounded px-2 py-1 w-full text-gray-900 text-xs focus:outline-none focus:border-blue-600", isFinancialColumn(col.label) && "text-right")}
+                                                            className={clsx("bg-white border border-slate-600 rounded px-2 py-1 w-full text-gray-900 text-xs focus:outline-none focus:border-blue-700", isFinancialColumn(col.label) && "text-right")}
                                                             value={editForm[col.label] || ''}
                                                             onChange={(e) => handleChange(col.label, e.target.value)}
                                                         />
