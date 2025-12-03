@@ -76,6 +76,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
     // Column resizing state
     const [columnWidths, setColumnWidths] = useState({});
     const [headerHeight, setHeaderHeight] = useState(48); // Default height reduced to 50% (was 96px, now 48px)
+    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
     const resizingRef = useRef(null);
     const headerResizingRef = useRef(null);
 
@@ -134,20 +135,11 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                     ...prev,
                     [resizingRef.current.label]: newWidth
                 }));
+                setHasUnsavedChanges(true);
             }
         };
 
         const onMouseUp = () => {
-            if (resizingRef.current) {
-                // Save to localStorage when resizing is complete
-                const storageKey = `inventory-column-widths-${role}`;
-                const updatedWidths = {
-                    ...columnWidths,
-                    [resizingRef.current.label]: columnWidths[resizingRef.current.label]
-                };
-                localStorage.setItem(storageKey, JSON.stringify(updatedWidths));
-            }
-
             resizingRef.current = null;
             document.removeEventListener('mousemove', onMouseMove);
             document.removeEventListener('mouseup', onMouseUp);
@@ -172,16 +164,11 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                 const diff = moveEvent.clientY - headerResizingRef.current.startY;
                 const newHeight = Math.max(40, headerResizingRef.current.startHeight + diff); // Min height 40px
                 setHeaderHeight(newHeight);
+                setHasUnsavedChanges(true);
             }
         };
 
         const onMouseUp = () => {
-            if (headerResizingRef.current) {
-                // Save to localStorage when resizing is complete
-                const headerHeightKey = `inventory-header-height-${role}`;
-                localStorage.setItem(headerHeightKey, headerHeight.toString());
-            }
-
             headerResizingRef.current = null;
             document.removeEventListener('mousemove', onMouseMove);
             document.removeEventListener('mouseup', onMouseUp);
@@ -246,6 +233,17 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
         onUpdate('COLUMN_ADD', col);
     };
 
+    const handleSaveLayout = () => {
+        const storageKey = `inventory-column-widths-${role}`;
+        localStorage.setItem(storageKey, JSON.stringify(columnWidths));
+
+        const headerHeightKey = `inventory-header-height-${role}`;
+        localStorage.setItem(headerHeightKey, headerHeight.toString());
+
+        setHasUnsavedChanges(false);
+        alert('Layout saved successfully!');
+    };
+
     // Helper to get value handling mismatches
     const getValue = (row, label) => {
         if (row[label] !== undefined) return row[label];
@@ -271,6 +269,16 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
             <div className="p-4 border-b border-zinc-800 flex justify-between items-center bg-zinc-900/50">
                 <h3 className="font-semibold text-lg">Records ({safeData.length})</h3>
                 <div className="flex gap-2">
+                    {hasUnsavedChanges && (
+                        <button
+                            onClick={handleSaveLayout}
+                            className="flex items-center gap-2 px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-lg transition-colors animate-pulse"
+                            title="Save column widths and header height"
+                        >
+                            <Save size={18} />
+                            Save Layout
+                        </button>
+                    )}
                     <button
                         onClick={() => setShowColManager(true)}
                         className="flex items-center gap-2 px-4 py-2 bg-teal-700 hover:bg-teal-600 text-white rounded-lg transition-colors"
@@ -293,7 +301,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                 <table className="w-full text-sm text-left border-collapse table-fixed">
                     <thead className="text-xs text-zinc-400 uppercase bg-zinc-950/90 sticky top-0 z-10">
                         <tr className="relative">
-                            <th className="px-4 font-medium border border-zinc-700 bg-zinc-900 sticky left-0 z-20 w-[100px] min-w-[100px]" style={{ height: `${headerHeight}px` }}>
+                            <th className="px-4 font-medium border border-zinc-700 bg-zinc-900 w-[100px] min-w-[100px]" style={{ height: `${headerHeight}px` }}>
                                 Actions
                             </th>
                             {safeColumns.map((col, index) => (
@@ -314,18 +322,17 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                                     />
                                 </th>
                             ))}
-                        </tr>
-                        {/* Header row resize handle */}
-                        <tr className="relative h-0">
-                            <th colSpan={safeColumns.length + 1} className="p-0 border-0 relative">
+                            {/* Header row resize handle */}
+                            <th colSpan={safeColumns.length + 1} className="p-0 border-0 relative" style={{ height: '0px', padding: '0' }}>
                                 <div
-                                    className="absolute left-0 right-0 h-1 cursor-row-resize hover:bg-primary-500 transition-opacity z-30 bg-primary-500/20"
-                                    style={{ top: '-4px', height: '4px' }}
+                                    className="absolute left-0 right-0 cursor-row-resize hover:bg-primary-500 z-30 bg-primary-500/30"
+                                    style={{ bottom: '-2px', height: '4px' }}
                                     onMouseDown={startHeaderResizing}
                                     title="Drag to resize header height"
                                 />
                             </th>
                         </tr>
+
                     </thead>
                     <tbody className="bg-zinc-900">
                         {isAdding && (
@@ -353,7 +360,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                             const isEditing = editingId === row._id;
                             return (
                                 <tr key={`row-${row._id}-${rowIndex}`} className={clsx("hover:bg-zinc-800/50 transition-colors", isEditing && "bg-zinc-800/80")}>
-                                    <td className="px-4 py-3 border border-zinc-700 bg-zinc-900 sticky left-0 z-10">
+                                    <td className="px-4 py-3 border border-zinc-700 bg-zinc-900">
                                         <div className="flex gap-2">
                                             {isEditing ? (
                                                 <>
