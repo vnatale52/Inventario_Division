@@ -79,6 +79,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
     const resizingRef = useRef(null);
     const headerResizingRef = useRef(null);
+    const headerHeightRef = useRef(headerHeight); // Keep ref in sync with state
 
     // Safety checks - force new array instances
     const safeData = Array.isArray(data) ? [...data].filter(Boolean) : [];
@@ -119,6 +120,11 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
         }
     }, [columns.length, role]); // Only depend on columns.length, not the array itself
 
+    // Keep ref in sync with state
+    useEffect(() => {
+        headerHeightRef.current = headerHeight;
+    }, [headerHeight]);
+
     const startResizing = useCallback((e, colLabel) => {
         e.preventDefault();
         resizingRef.current = {
@@ -155,22 +161,28 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
         console.log('startHeaderResizing called', e);
         e.preventDefault();
         e.stopPropagation();
+
+        const currentHeight = headerHeightRef.current;
+        console.log('Current header height:', currentHeight);
+
         headerResizingRef.current = {
             startY: e.clientY,
-            startHeight: headerHeight
+            startHeight: currentHeight
         };
         console.log('Header resize started:', headerResizingRef.current);
 
         const onMouseMove = (moveEvent) => {
             if (headerResizingRef.current) {
                 const diff = moveEvent.clientY - headerResizingRef.current.startY;
-                const newHeight = Math.max(20, headerResizingRef.current.startHeight + diff); // Min height 20px
+                const newHeight = Math.max(20, headerResizingRef.current.startHeight + diff);
+                console.log('Moving:', { diff, newHeight });
                 setHeaderHeight(newHeight);
                 setHasUnsavedChanges(true);
             }
         };
 
         const onMouseUp = () => {
+            console.log('Mouse up - resize ended');
             headerResizingRef.current = null;
             document.removeEventListener('mousemove', onMouseMove);
             document.removeEventListener('mouseup', onMouseUp);
