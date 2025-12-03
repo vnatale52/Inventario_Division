@@ -422,13 +422,13 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                                                         </span>
                                                     ) : (
                                                         <input
-                                                            className={clsx("bg-zinc-900 border border-zinc-700 rounded px-2 py-1 w-full text-white text-xs focus:outline-none focus:border-primary-500", isFinancialColumn(col.label) && "text-right")}
+                                                            className={clsx("bg-white border border-slate-300 rounded px-2 py-1 w-full text-gray-900 text-xs focus:outline-none focus:border-blue-500", isFinancialColumn(col.label) && "text-right")}
                                                             value={editForm[col.label] || ''}
                                                             onChange={(e) => handleChange(col.label, e.target.value)}
                                                         />
                                                     )
                                                 ) : (
-                                                    <span className={clsx("text-zinc-300 text-xs truncate block", isFinancialColumn(col.label) && "text-right")} title={val}>
+                                                    <span className={clsx("text-gray-900 text-xs truncate block", isFinancialColumn(col.label) && "text-right")} title={val}>
                                                         {val || '-'}
                                                     </span>
                                                 )}
