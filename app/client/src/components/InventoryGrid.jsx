@@ -75,7 +75,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
 
     // Column resizing state
     const [columnWidths, setColumnWidths] = useState({});
-    const [headerHeight, setHeaderHeight] = useState(24); // Default height reduced to 50% of previous (was 48px, now 24px)
+    const [headerHeight, setHeaderHeight] = useState(17); // Default height reduced by 30% from 24px
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
     const resizingRef = useRef(null);
     const headerResizingRef = useRef(null);
@@ -114,7 +114,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
             try {
                 setHeaderHeight(parseInt(savedHeaderHeight, 10));
             } catch (e) {
-                setHeaderHeight(24);
+                setHeaderHeight(17);
             }
         }
     }, [columns.length, role]); // Only depend on columns.length, not the array itself
@@ -178,7 +178,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
         document.addEventListener('mousemove', onMouseMove);
         document.addEventListener('mouseup', onMouseUp);
         document.body.style.cursor = 'row-resize';
-    }, [headerHeight, role]);
+    }, []);
 
     const handleEdit = (row) => {
         setEditingId(row._id);
@@ -266,7 +266,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                 />
             )}
 
-            <div className="p-4 border-b border-zinc-800 flex justify-between items-center bg-zinc-900/50">
+            <div className="p-3 border-b border-zinc-800 flex justify-between items-center bg-zinc-900/50">
                 <h3 className="font-semibold text-lg">Records ({safeData.length})</h3>
                 <div className="flex gap-2">
                     {hasUnsavedChanges && (
@@ -301,8 +301,18 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                 <table className="w-full text-sm text-left border-collapse table-fixed">
                     <thead className="text-xs text-zinc-400 uppercase bg-zinc-950/90 sticky top-0 z-10">
                         <tr className="relative">
-                            <th className="px-4 font-medium border border-zinc-700 bg-zinc-900 w-[100px] min-w-[100px] relative" style={{ height: `${headerHeight}px` }}>
+                            <th className="px-4 font-medium border border-zinc-700 bg-zinc-900 w-[100px] min-w-[100px] relative group" style={{ height: `${headerHeight}px` }}>
                                 Actions
+                                {/* Column width resize handle */}
+                                <div
+                                    className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-primary-500 opacity-0 group-hover:opacity-100 transition-opacity z-20"
+                                    onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        // Actions column is fixed width, but we can add resize if needed
+                                        alert('Actions column width is fixed at 100px');
+                                    }}
+                                />
                                 {/* Header height resize handle */}
                                 <div
                                     className="absolute left-0 right-0 cursor-row-resize hover:bg-green-500 z-40 bg-green-500/40"
