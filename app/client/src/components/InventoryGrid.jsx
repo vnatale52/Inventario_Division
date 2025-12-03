@@ -313,9 +313,9 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
 
             <div className="overflow-x-auto max-h-[calc(100vh-200px)] border-t border-zinc-700" style={{ scrollbarWidth: 'thin' }}>
                 <table className="w-full text-sm text-left border-collapse table-fixed">
-                    <thead className="text-xs text-zinc-700 uppercase bg-emerald-100 sticky top-0 z-10">
+                    <thead className="text-xs text-white uppercase bg-slate-700 sticky top-0 z-10">
                         <tr className="relative">
-                            <th className="px-2 font-medium border border-zinc-700 bg-emerald-100 w-[80px] min-w-[80px] max-w-[80px] relative group" style={{ height: `${headerHeight}px` }}>
+                            <th className="px-2 font-medium border border-zinc-700 bg-slate-700 w-[80px] min-w-[80px] max-w-[80px] relative group" style={{ height: `${headerHeight}px` }}>
                                 Actions
                                 {/* Column width resize handle */}
                                 <div
@@ -338,7 +338,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                             {safeColumns.map((col, index) => (
                                 <th
                                     key={`col-${col.id}-${index}`}
-                                    className="px-4 font-medium border border-zinc-700 relative group bg-emerald-100"
+                                    className="px-4 font-medium border border-zinc-700 relative group bg-slate-700"
                                     style={{ width: columnWidths[col.label] || getInitialWidth(col.label), minWidth: columnWidths[col.label] || getInitialWidth(col.label), height: `${headerHeight}px` }}
                                     title={col.label}
                                 >
