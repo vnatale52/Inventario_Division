@@ -85,11 +85,13 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
 
     // Initialize column widths from localStorage or defaults
     useEffect(() => {
+        if (!columns || columns.length === 0) return;
+
         const storageKey = `inventory-column-widths-${role}`;
         const savedWidths = localStorage.getItem(storageKey);
 
         const initialWidths = {};
-        safeColumns.forEach(col => {
+        columns.forEach(col => {
             initialWidths[col.label] = getInitialWidth(col.label);
         });
 
@@ -114,7 +116,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                 setHeaderHeight(48);
             }
         }
-    }, [safeColumns, role]);
+    }, [columns.length, role]); // Only depend on columns.length, not the array itself
 
     const startResizing = useCallback((e, colLabel) => {
         e.preventDefault();
