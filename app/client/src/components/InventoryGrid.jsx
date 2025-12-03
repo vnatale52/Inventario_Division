@@ -339,7 +339,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                                 <th
                                     key={`col-${col.id}-${index}`}
                                     className="px-4 font-medium border-2 border-slate-400 relative group bg-slate-700"
-                                    style={{ width: columnWidths[col.label] || getInitialWidth(col.label), minWidth: '40px', height: `${headerHeight}px` }}
+                                    style={{ width: columnWidths[col.label] || getInitialWidth(col.label), minWidth: '20px', height: `${headerHeight}px` }}
                                     title={col.label}
                                 >
                                     <div className="flex flex-col gap-0.5">
@@ -363,19 +363,19 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                         </tr>
 
                     </thead>
-                    <tbody className="bg-slate-50">
+                    <tbody className="bg-slate-200">
                         {isAdding && (
                             <tr className="bg-primary-900/10">
-                                <td className="px-4 py-3 border border-slate-300 bg-white">
+                                <td className="px-4 py-3 border border-slate-400 bg-slate-100">
                                     <div className="flex gap-2">
                                         <button onClick={handleSave} className="text-green-400 hover:text-green-300"><Save size={18} /></button>
                                         <button onClick={handleCancel} className="text-red-400 hover:text-red-300"><X size={18} /></button>
                                     </div>
                                 </td>
                                 {safeColumns.map((col, index) => (
-                                    <td key={`add-${col.id}-${index}`} className="px-4 py-3 border border-slate-300 overflow-hidden">
+                                    <td key={`add-${col.id}-${index}`} className="px-4 py-3 border border-slate-400 overflow-hidden">
                                         <input
-                                            className="bg-white border border-slate-300 rounded px-2 py-1 w-full text-gray-900 text-xs focus:outline-none focus:border-blue-500"
+                                            className="bg-white border border-slate-400 rounded px-2 py-1 w-full text-gray-900 text-xs focus:outline-none focus:border-blue-500"
                                             value={editForm[col.label] || ''}
                                             onChange={(e) => handleChange(col.label, e.target.value)}
                                             placeholder={col.label}
@@ -388,8 +388,8 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                         {safeData.map((row, rowIndex) => {
                             const isEditing = editingId === row._id;
                             return (
-                                <tr key={`row-${row._id}-${rowIndex}`} className={clsx("hover:bg-blue-100 transition-colors odd:bg-white even:bg-slate-50", isEditing && "!bg-blue-50")}>
-                                    <td className="px-4 py-3 border border-slate-300 bg-slate-50">
+                                <tr key={`row-${row._id}-${rowIndex}`} className={clsx("hover:bg-blue-200 transition-colors odd:bg-slate-100 even:bg-slate-200", isEditing && "!bg-blue-100")}>
+                                    <td className="px-4 py-3 border border-slate-400 bg-transparent">
                                         <div className="flex gap-2">
                                             {isEditing ? (
                                                 <>
@@ -413,7 +413,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                                         }
 
                                         return (
-                                            <td key={`cell-${row._id}-${col.id}-${colIndex}`} className={clsx("px-4 py-3 whitespace-nowrap border border-slate-300 overflow-hidden", isFinancialColumn(col.label) && "text-right")}>
+                                            <td key={`cell-${row._id}-${col.id}-${colIndex}`} className={clsx("px-4 py-3 whitespace-nowrap border border-slate-400 overflow-hidden", isFinancialColumn(col.label) && "text-right")}>
                                                 {isEditing ? (
                                                     col.label === 'Orden' ? (
                                                         // Display read-only order number in edit mode
@@ -422,7 +422,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                                                         </span>
                                                     ) : (
                                                         <input
-                                                            className={clsx("bg-white border border-slate-300 rounded px-2 py-1 w-full text-gray-900 text-xs focus:outline-none focus:border-blue-500", isFinancialColumn(col.label) && "text-right")}
+                                                            className={clsx("bg-white border border-slate-400 rounded px-2 py-1 w-full text-gray-900 text-xs focus:outline-none focus:border-blue-500", isFinancialColumn(col.label) && "text-right")}
                                                             value={editForm[col.label] || ''}
                                                             onChange={(e) => handleChange(col.label, e.target.value)}
                                                         />
