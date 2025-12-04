@@ -184,7 +184,8 @@ Inventory System
 // Backup endpoint (Updated for Postgres)
 app.post('/api/backup', authenticateToken, async (req, res) => {
     try {
-        const { username } = req.body;
+        // Use authenticated username from token for security
+        const authenticatedUsername = req.user.username;
 
         // Fetch data
         const columnsRes = await pool.query('SELECT * FROM columns ORDER BY column_id');
@@ -193,15 +194,13 @@ app.post('/api/backup', authenticateToken, async (req, res) => {
         const columnsData = columnsRes.rows;
         let inventoryData = inventoryRes.rows.map(r => r.data);
 
-        // Filter data based on user role (using the role from the token, not just the body username)
-        // We need to verify the user from the token to be secure, but here we use req.user from middleware
+        // Filter data based on user role
         if (req.user.role !== 'ADMIN') {
             const userRole = req.user.role;
-            const username = req.user.username; // Use authenticated username
 
             inventoryData = inventoryData.filter(row => {
                 const val = row[userRole];
-                return val && val.trim() === username;
+                return val && val.trim() === authenticatedUsername;
             });
         }
 
@@ -227,7 +226,7 @@ app.post('/api/backup', authenticateToken, async (req, res) => {
         const dateStr = `${pad(argentinaTime.getDate())}-${pad(argentinaTime.getMonth() + 1)}-${argentinaTime.getFullYear()}`;
         const timeStr = `${pad(argentinaTime.getHours())}-${pad(argentinaTime.getMinutes())}-${pad(argentinaTime.getSeconds())}`;
 
-        const filename = `${username}_backup_${dateStr}_${timeStr}.csv`;
+        const filename = `${authenticatedUsername}_backup_${dateStr}_${timeStr}.csv`;
 
         // Send as download
         res.setHeader('Content-Type', 'text/csv');
