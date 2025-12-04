@@ -1,7 +1,7 @@
-Número Columna;Descripción
+Numero Columna;Descripcion
 1;Orden
 2;Mes
-3;Año
+3;Anio
 4;DIR
 5;DPTO
 6;DIV
@@ -14,9 +14,9 @@ Número Columna;Descripción
 13;REVISOR DIREC
 14;RAZON SOCIAL
 15;CARGO
-16;AÑO CARGO
+16;ANIO CARGO
 17;EXPTE
-18;AÑO EXPTE
+18;ANIO EXPTE
 19;CUIT
 20;CATEG CONTR
 21;NRO INSCRIP
@@ -81,5 +81,5 @@ Número Columna;Descripción
 80;Total Dif. conformadas - Accesorios
 81;Total Dif. NO conformadas - Impuesto
 82;Total Dif. NO conformadas - Accesorios
-83;Recaudación Total
-84;Recaudación Nominal
+83;Recaudacion Total
+84;Recaudacion Nominal

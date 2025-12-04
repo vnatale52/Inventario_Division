@@ -6,68 +6,31 @@ import axios from 'axios';
 
 // Helper to determine initial width based on column name
 const getInitialWidth = (label) => {
-    // Small columns: ~5 characters width (50px - reduced)
-    const smallColumns = [
-        'Mes', 'Año', 'Orden', 'DIR', 'DPTO', 'DIV', 'SECT', 'CARGO',
-        'AÑO CARGO', 'AÑO EXPTE', 'CATEG CONTR', 'DV', 'TR',
-        'Cargo nuevo del mes actual', 'Ingresa como DV/TR del mes actual',
-        'Queda stock mes actual', 'Descargo del mes actual'
-    ];
+    // Small columns: short labels (less than 15 characters)
+    if (label.length <= 15) return 50;
 
-    // Medium columns: ~14 characters width (120px - reduced)
-    const mediumColumns = [
-        'Dif. canceladas en un pago - Impuesto', 'Dif. canceladas en un pago - Accesorios',
-        'Pago en Curso Rectif. - Impuesto', 'Pago en Curso Rectif. - Accesorios',
-        'Plan de facilidades - Impuesto', 'Plan de facilidades - Accesorios', 'Plan de facilidades - cantidad',
-        'Multa reducida - Impuesto', 'Multa reducida - Accesorios', 'Multa reducida - cantidad',
-        'BD - Dif. de al¡cuota - Impuesto', 'BD - Dif. de al¡cuota - Accesorios',
-        'BD - Desc. improc. - Impuesto', 'BD - Desc. improc. - Accesorios',
-        'BD - Dif. acept. no abonada - Impuesto', 'BD - Dif. acept. no abonada - Accesorios',
-        'BD - Deuda concursal falencial - Impuesto', 'BD - Deuda concursal falencial - Accesorios',
-        'ISIB Dif. no conformadas - Impuesto', 'ISIB Dif. no conformadas - Accesorios',
-        'Sellos Pago en curso - Impuesto', 'Sellos pago en curso - Accesorios',
-        'Sellos BD - Impuesto', 'Sellos BD - Accesorios',
-        'Sellos Plan de facilid. - Impuesto', 'Sellos Plan de facilid. - Accesorios', 'Sellos Plan de facilid. - cantidad',
-        'Sellos Dif. no conformadas - Impuesto', 'Sellos Dif. no conformadas - Accesorios',
-        'Empadron. Pago en curso - Impuesto', 'Empadron. Pago en curso - Accesorios',
-        'Empadronados BD - Impuesto', 'Empadronados BD - Accesorios',
-        'Total Dif. conformadas - Impuesto', 'Total Dif. conformadas - Accesorios',
-        'Total Dif. NO conformadas - Impuesto', 'Total Dif. NO conformadas - Accesorios',
-        'Recaudación Total', 'Recaudación Nominal'
-    ];
+    // Medium columns: contains financial keywords
+    if (label.includes('Impuesto') || label.includes('Accesorios') ||
+        label.includes('cantidad') || label.includes('Recaudacion') ||
+        label.includes('Total') || label.includes('BD') ||
+        label.includes('Sellos') || label.includes('Empadron')) {
+        return 120;
+    }
 
-    // Use exact matching instead of includes() to prevent false matches
-    if (smallColumns.includes(label)) return 50;
-    if (mediumColumns.includes(label)) return 120;
     return 150; // Default width for other columns
 };
 
-// Helper to determine if column should be left-aligned (financial columns)
+// Helper to determine if column should be right-aligned (financial columns)
 const isFinancialColumn = (label) => {
-    const financialColumns = [
-        'Dif. canceladas en un pago - Impuesto', 'Dif. canceladas en un pago - Accesorios',
-        'Pago en Curso Rectif. - Impuesto', 'Pago en Curso Rectif. - Accesorios',
-        'Plan de facilidades - Impuesto', 'Plan de facilidades - Accesorios', 'Plan de facilidades - cantidad',
-        'Multa reducida - Impuesto', 'Multa reducida - Accesorios', 'Multa reducida - cantidad',
-        'BD - Dif. de al¡cuota - Impuesto', 'BD - Dif. de al¡cuota - Accesorios',
-        'BD - Desc. improc. - Impuesto', 'BD - Desc. improc. - Accesorios',
-        'BD - Dif. acept. no abonada - Impuesto', 'BD - Dif. acept. no abonada - Accesorios',
-        'BD - Deuda concursal falencial - Impuesto', 'BD - Deuda concursal falencial - Accesorios',
-        'ISIB Dif. no conformadas - Impuesto', 'ISIB Dif. no conformadas - Accesorios',
-        'Sellos Pago en curso - Impuesto', 'Sellos pago en curso - Accesorios',
-        'Sellos BD - Impuesto', 'Sellos BD - Accesorios',
-        'Sellos Plan de facilid. - Impuesto', 'Sellos Plan de facilid. - Accesorios', 'Sellos Plan de facilid. - cantidad',
-        'Sellos Dif. no conformadas - Impuesto', 'Sellos Dif. no conformadas - Accesorios',
-        'Empadron. Pago en curso - Impuesto', 'Empadron. Pago en curso - Accesorios',
-        'Empadronados BD - Impuesto', 'Empadronados BD - Accesorios',
-        'Total Dif. conformadas - Impuesto', 'Total Dif. conformadas - Accesorios',
-        'Total Dif. NO conformadas - Impuesto', 'Total Dif. NO conformadas - Accesorios',
-        'Recaudación Total', 'Recaudación Nominal'
-    ];
-    return financialColumns.includes(label);
+    // Financial columns typically contain these keywords
+    return label.includes('Impuesto') || label.includes('Accesorios') ||
+        label.includes('cantidad') || label.includes('Recaudacion') ||
+        label.includes('Total') || label.includes('Dif.') ||
+        label.includes('Pago') || label.includes('Plan') ||
+        label.includes('Multa') || label.includes('BD');
 };
 
-export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
+export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
     const [editingId, setEditingId] = useState(null);
     const [editForm, setEditForm] = useState({});
     const [isAdding, setIsAdding] = useState(false);
@@ -89,7 +52,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
     useEffect(() => {
         if (!columns || columns.length === 0) return;
 
-        const storageKey = `inventory-column-widths-${role}`;
+        const storageKey = `inventory-column-widths-${username}`;
         const savedWidths = localStorage.getItem(storageKey);
 
         const initialWidths = {};
@@ -109,7 +72,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
         }
 
         // Load header height from localStorage
-        const headerHeightKey = `inventory-header-height-${role}`;
+        const headerHeightKey = `inventory-header-height-${username}`;
         const savedHeaderHeight = localStorage.getItem(headerHeightKey);
         if (savedHeaderHeight) {
             try {
@@ -118,7 +81,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
                 setHeaderHeight(17);
             }
         }
-    }, [columns.length, role]); // Only depend on columns.length, not the array itself
+    }, [columns.length, username]); // Only depend on columns.length, not the array itself
 
     // Keep ref in sync with state
     useEffect(() => {
@@ -155,7 +118,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
         document.addEventListener('mousemove', onMouseMove);
         document.addEventListener('mouseup', onMouseUp);
         document.body.style.cursor = 'col-resize';
-    }, [columnWidths, role]);
+    }, [columnWidths, username]);
 
     const startHeaderResizing = useCallback((e) => {
         console.log('startHeaderResizing called', e);
@@ -248,10 +211,10 @@ export const InventoryGrid = ({ data, columns, onUpdate, role }) => {
     };
 
     const handleSaveLayout = () => {
-        const storageKey = `inventory-column-widths-${role}`;
+        const storageKey = `inventory-column-widths-${username}`;
         localStorage.setItem(storageKey, JSON.stringify(columnWidths));
 
-        const headerHeightKey = `inventory-header-height-${role}`;
+        const headerHeightKey = `inventory-header-height-${username}`;
         localStorage.setItem(headerHeightKey, headerHeight.toString());
 
         setHasUnsavedChanges(false);

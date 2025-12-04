@@ -3,11 +3,13 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchData, updateData, updateColumns, createBackup } from './api';
 import { InventoryGrid } from './components/InventoryGrid';
 import { Login } from './components/Login';
+import { UserManager } from './components/UserManager';
 import { Loader2 } from 'lucide-react';
 
 function App() {
   const [user, setUser] = useState(null);
   const [loadingAuth, setLoadingAuth] = useState(true);
+  const [showUserManager, setShowUserManager] = useState(false);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -82,6 +84,16 @@ function App() {
           <p className="text-zinc-400 mt-1">Logged in as: <span className="text-white font-medium">{user.username} ({user.role})</span></p>
         </div>
         <div className="flex gap-3 items-center">
+          {user.role === 'ADMIN' && (
+            <button
+              onClick={() => setShowUserManager(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-purple-700 hover:bg-purple-600 text-white rounded-lg transition-colors text-sm"
+              title="Manage users"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+              Manage Users
+            </button>
+          )}
           <button
             onClick={async () => {
               try {
@@ -126,6 +138,10 @@ function App() {
         </div>
       </header>
 
+      {showUserManager && (
+        <UserManager onClose={() => setShowUserManager(false)} />
+      )}
+
       <main>
         <InventoryGrid
           data={data?.inventory || []}
@@ -138,6 +154,7 @@ function App() {
             }
           }}
           role={user.role}
+          username={user.username}
         />
       </main>
     </div>

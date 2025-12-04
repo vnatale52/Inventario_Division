@@ -76,12 +76,25 @@ app.get('/api/data', authenticateToken, async (req, res) => {
         const inventoryRes = await pool.query('SELECT * FROM inventory ORDER BY id');
 
         // Transform inventory data to match frontend expectation (flatten JSONB)
-        const inventory = inventoryRes.rows.map(row => {
+        let inventory = inventoryRes.rows.map(row => {
             return {
                 _id: row.id,
                 ...row.data
             };
         });
+
+        // Filter data based on user role
+        if (req.user.role !== 'ADMIN') {
+            const userRole = req.user.role;
+            const username = req.user.username;
+
+            inventory = inventory.filter(row => {
+                // Check if the row has a column matching the user's role
+                // and if the value in that column matches the username
+                const val = row[userRole];
+                return val && val.trim() === username;
+            });
+        }
 
         res.json({
             columns: columnsRes.rows,
@@ -178,7 +191,19 @@ app.post('/api/backup', authenticateToken, async (req, res) => {
         const inventoryRes = await pool.query('SELECT * FROM inventory ORDER BY id');
 
         const columnsData = columnsRes.rows;
-        const inventoryData = inventoryRes.rows.map(r => r.data);
+        let inventoryData = inventoryRes.rows.map(r => r.data);
+
+        // Filter data based on user role (using the role from the token, not just the body username)
+        // We need to verify the user from the token to be secure, but here we use req.user from middleware
+        if (req.user.role !== 'ADMIN') {
+            const userRole = req.user.role;
+            const username = req.user.username; // Use authenticated username
+
+            inventoryData = inventoryData.filter(row => {
+                const val = row[userRole];
+                return val && val.trim() === username;
+            });
+        }
 
         // Generate CSV content
         const headers = columnsData.map(c => c.label);
@@ -215,7 +240,91 @@ app.post('/api/backup', authenticateToken, async (req, res) => {
     }
 });
 
+// --- User Management Routes (ADMIN only) ---
+
+app.get('/api/users', authenticateToken, async (req, res) => {
+    try {
+        // Check if user is admin
+        if (req.user.role !== 'ADMIN') {
+            return res.status(403).json({ error: 'Access denied. Admin only.' });
+        }
+
+        const fs = require('fs');
+        const path = require('path');
+        const usuariosPath = path.join(__dirname, '../../usuarios.csv');
+
+        const csvContent = fs.readFileSync(usuariosPath, 'utf-8');
+        const lines = csvContent.trim().split('\n');
+
+        if (lines.length < 1) {
+            return res.json({ roles: [], users: [] });
+        }
+
+        // Parse header (roles)
+        const roles = lines[0].split(';').map(r => r.trim());
+
+        // Parse data rows
+        const users = [];
+        for (let i = 1; i < lines.length; i++) {
+            const values = lines[i].split(';').map(v => v.trim());
+            users.push(values);
+        }
+
+        res.json({ roles, users });
+    } catch (error) {
+        console.error('Error reading users:', error);
+        res.status(500).json({ error: 'Failed to read users' });
+    }
+});
+
+app.post('/api/users', authenticateToken, async (req, res) => {
+    try {
+        // Check if user is admin
+        if (req.user.role !== 'ADMIN') {
+            return res.status(403).json({ error: 'Access denied. Admin only.' });
+        }
+
+        const { roles, users } = req.body;
+
+        if (!roles || !users) {
+            return res.status(400).json({ error: 'Invalid request. Roles and users required.' });
+        }
+
+        const fs = require('fs');
+        const path = require('path');
+        const { execSync } = require('child_process');
+        const usuariosPath = path.join(__dirname, '../../usuarios.csv');
+
+        // Build CSV content
+        const lines = [roles.join(';')];
+        users.forEach(userRow => {
+            lines.push(userRow.join(';'));
+        });
+
+        const csvContent = lines.join('\n');
+
+        // Write to file
+        fs.writeFileSync(usuariosPath, csvContent, 'utf-8');
+
+        // Re-seed users in database
+        try {
+            const seedPath = path.join(__dirname, 'seed_users.js');
+            execSync(`node "${seedPath}"`, { cwd: __dirname });
+            console.log('Users re-seeded successfully');
+        } catch (seedError) {
+            console.error('Error re-seeding users:', seedError);
+            return res.status(500).json({ error: 'Users saved but failed to update database' });
+        }
+
+        res.json({ success: true, message: 'Users updated successfully' });
+    } catch (error) {
+        console.error('Error updating users:', error);
+        res.status(500).json({ error: 'Failed to update users' });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
+
 
