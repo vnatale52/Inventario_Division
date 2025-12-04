@@ -4,7 +4,7 @@ services:
     name: inventory-backend
     env: node
     rootDir: app/server
-    buildCommand: npm install
+    buildCommand: npm install && node seed_users.js
     startCommand: node index.js
     plan: free
     envVars:
