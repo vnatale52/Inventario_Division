@@ -10,6 +10,10 @@ const migrate = async () => {
     try {
         await initDB();
 
+        // Clear existing data to prevent duplicates
+        console.log('Clearing existing data...');
+        await pool.query('TRUNCATE TABLE columns, inventory RESTART IDENTITY CASCADE');
+
         // 1. Migrate Columns
         console.log('Migrating columns...');
         const columnsContent = fs.readFileSync(COLUMNS_FILE, 'latin1');
