@@ -310,11 +310,23 @@ app.post('/api/users', authenticateToken, async (req, res) => {
         // Re-seed users in database
         try {
             const seedPath = path.join(__dirname, 'seed_users.js');
-            execSync(`node "${seedPath}"`, { cwd: __dirname });
+            const result = execSync(`node "${seedPath}"`, {
+                cwd: __dirname,
+                encoding: 'utf-8',
+                stdio: 'pipe'
+            });
             console.log('Users re-seeded successfully');
+            console.log('Seed output:', result);
         } catch (seedError) {
             console.error('Error re-seeding users:', seedError);
-            return res.status(500).json({ error: 'Users saved but failed to update database' });
+            console.error('Seed error output:', seedError.stderr);
+            console.error('Seed error stdout:', seedError.stdout);
+            return res.status(500).json({
+                error: 'Users saved but failed to update database',
+                details: seedError.message,
+                stderr: seedError.stderr,
+                stdout: seedError.stdout
+            });
         }
 
         res.json({ success: true, message: 'Users updated successfully' });
