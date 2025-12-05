@@ -258,7 +258,14 @@ Inventario División/
 #### Creating Backups
 - Click "Backup" button in header
 - Downloads CSV with only your visible records
-- Filename includes your username and timestamp
+- **Security**: Filename includes your authenticated username and timestamp (server-side enforcement)
+- **Format**: `{username}_backup_{DD-MM-YYYY}_{HH-MM-SS}.csv`
+
+### Recent Fixes & Improvements
+- **Backup Security**: Filename generation now uses the authenticated JWT token's username instead of client-provided data.
+- **CORS Configuration**: Added `exposedHeaders: ['Content-Disposition']` to allow frontend to read the correct backup filename.
+- **Error Logging**: Enhanced server-side logging for User Management to debug file locking issues (`EBUSY`).
+- **Data Sanitization**: Automated scripts to clean special characters (ñ, ó) from CSV headers.
 
 ## Default Users
 
