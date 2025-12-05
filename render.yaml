@@ -4,7 +4,7 @@ services:
     name: inventory-backend
     env: node
     rootDir: app/server
-    buildCommand: npm install && node seed_users.js
+    buildCommand: npm install && node seed_users.js && node migrate_csv_to_pg.js
     startCommand: node index.js
     plan: free
     envVars:

@@ -19,24 +19,22 @@ Los siguientes archivos CSV deben estar en el repositorio (ya están):
 - ✅ `usuarios.csv` - Tabla de usuarios
 - ✅ `columnas.csv` - Definición de columnas
 
-### 3. Guía de Migración de Datos (Importante)
+### 3. Guía de Migración de Datos (100% Automática)
 
-Existen dos tipos de datos que se manejan de forma diferente:
+Gracias a las optimizaciones para el Plan Free de Render (sin acceso a Shell), todo el proceso es ahora automático y seguro.
 
 #### A. Usuarios (`usuarios.csv`) - AUTOMÁTICO 🟢
-- **Proceso**: Se ejecuta automáticamente en cada despliegue (Build).
-- **Script**: `node seed_users.js` (definido en `render.yaml`).
-- **Acción requerida**: Ninguna.
-- **Comportamiento**: Crea usuarios nuevos y actualiza roles. No resetea contraseñas de usuarios existentes.
+- **Script**: `seed_users.js`
+- **Comportamiento**: Se ejecuta en cada deploy. Crea usuarios si no existen y actualiza roles.
 
-#### B. Inventario (`Inventario.csv`) - MANUAL 🟠
-- **Proceso**: Se debe ejecutar manualmente una sola vez al inicio.
-- **Script**: `node migrate_csv_to_pg.js`.
-- **Acción requerida**:
-  1. Ir al Dashboard de Render → Backend Service.
-  2. Pestaña **Shell**.
-  3. Ejecutar: `cd app/server && node migrate_csv_to_pg.js`
-- **Comportamiento**: Carga los datos iniciales del inventario a la base de datos. Solo necesario la primera vez.
+#### B. Inventario (`Inventario.csv`) - AUTOMÁTICO Y SEGURO 🟢
+- **Script**: `migrate_csv_to_pg.js`
+- **Comportamiento Mejorado**:
+  - Se ejecuta automáticamente después de `seed_users.js`.
+  - **Verifica si la base de datos ya tiene datos**.
+  - **Si está vacía** (primer deploy): Carga todos los datos del CSV.
+  - **Si ya tiene datos**: Omite la carga para **NO SOBRESCRIBIR** tu trabajo en producción.
+  - **Acción requerida**: NINGUNA. Todo listo desde el primer despliegue.
 
 ### 4. Verificación Post-Despliegue
 

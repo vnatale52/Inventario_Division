@@ -10,8 +10,17 @@ const migrate = async () => {
     try {
         await initDB();
 
-        // Clear existing data to prevent duplicates
-        console.log('Clearing existing data...');
+        // Check if database is already populated
+        const res = await pool.query('SELECT COUNT(*) FROM inventory');
+        const count = parseInt(res.rows[0].count);
+
+        if (count > 0) {
+            console.log('Database already has data (rows: ' + count + '). Skipping migration to prevent overwrite.');
+            process.exit(0);
+        }
+
+        // Only clear if we are proceeding with migration (though if count is 0, truncate is redundant but safe)
+        console.log('Database is empty. Starting migration...');
         await pool.query('TRUNCATE TABLE columns, inventory RESTART IDENTITY CASCADE');
 
         // 1. Migrate Columns
