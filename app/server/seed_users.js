@@ -1,10 +1,13 @@
-const { pool } = require('./db');
+const { pool, initDB } = require('./db');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const path = require('path');
 
 const seedUsers = async () => {
     try {
+        // Initialize DB tables if they don't exist
+        await initDB();
+
         console.log('Seeding users...');
 
         // Read usuarios.csv file
