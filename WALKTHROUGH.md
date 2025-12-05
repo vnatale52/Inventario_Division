@@ -29,6 +29,7 @@ Juan;Supervisor3;RevisorDiv3;Jefa3;RevisorDepto3;RevisorDirec3
 The script now:
 - Reads `usuarios.csv` dynamically
 - Parses roles from the header row
+- **Initializes database tables** automatically (prevents build errors)
 - Creates user accounts for each username
 - Automatically adds an `admin` user with `ADMIN` role
 - Default password for all users: `password123`
