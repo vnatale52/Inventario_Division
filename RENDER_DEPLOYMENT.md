@@ -19,12 +19,24 @@ Los siguientes archivos CSV deben estar en el repositorio (ya están):
 - ✅ `usuarios.csv` - Tabla de usuarios
 - ✅ `columnas.csv` - Definición de columnas
 
-### 3. Seeding Automático
+### 3. Guía de Migración de Datos (Importante)
 
-El `render.yaml` actualizado ahora ejecuta `node seed_users.js` durante el build, lo que:
-- Lee `usuarios.csv`
-- Crea todos los usuarios en la base de datos PostgreSQL
-- Asigna la contraseña por defecto `password123`
+Existen dos tipos de datos que se manejan de forma diferente:
+
+#### A. Usuarios (`usuarios.csv`) - AUTOMÁTICO 🟢
+- **Proceso**: Se ejecuta automáticamente en cada despliegue (Build).
+- **Script**: `node seed_users.js` (definido en `render.yaml`).
+- **Acción requerida**: Ninguna.
+- **Comportamiento**: Crea usuarios nuevos y actualiza roles. No resetea contraseñas de usuarios existentes.
+
+#### B. Inventario (`Inventario.csv`) - MANUAL 🟠
+- **Proceso**: Se debe ejecutar manualmente una sola vez al inicio.
+- **Script**: `node migrate_csv_to_pg.js`.
+- **Acción requerida**:
+  1. Ir al Dashboard de Render → Backend Service.
+  2. Pestaña **Shell**.
+  3. Ejecutar: `cd app/server && node migrate_csv_to_pg.js`
+- **Comportamiento**: Carga los datos iniciales del inventario a la base de datos. Solo necesario la primera vez.
 
 ### 4. Verificación Post-Despliegue
 
