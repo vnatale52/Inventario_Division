@@ -100,17 +100,42 @@ buildCommand: npm install && node seed_users.js  # ← Agregado seeding
 
 Esto asegura que los usuarios se creen automáticamente cada vez que se despliega.
 
-## Pasos para Desplegar
+## Pasos Detallados para Desplegar (Blueprint)
 
-1. **Commit y push** (ya hecho ✅)
-2. **Conectar repositorio en Render**:
-   - New → Blueprint
-   - Conectar repositorio GitHub
-   - Render detectará `render.yaml`
-3. **Esperar despliegue** (~5-10 minutos)
-4. **Actualizar VITE_API_URL** en frontend
-5. **Redesplegar frontend**
-6. **Probar login** con admin/password123
+### ⚠️ AVISO IMPORTANTE: Base de Datos Existente
+Mencionaste que ya creaste `inventory-db`. El **Blueprint** (`render.yaml`) está diseñado para crear y configurar su propia base de datos automáticamente.
+
+**Recomendación**: Para evitar conflictos de nombres o configuraciones, **elimina la base de datos `inventory-db` que creaste manualmente** antes de proceder. El Blueprint creará una nueva configuración perfecta automáticamente.
+
+### Guía Paso a Paso en Render
+
+1.  **Iniciar**:
+    - Ve a tu Dashboard de Render (https://dashboard.render.com).
+    - Haz clic en el botón azul **"New +"**.
+    - Selecciona **"Blueprint"**.
+
+2.  **Conectar Repositorio**:
+    - Verás una lista de tus repositorios de GitHub.
+    - Busca `Inventario_Division` y haz clic en **"Connect"**.
+
+3.  **Configuración del Blueprint**:
+    - Render detectará automáticamente el archivo `render.yaml`.
+    - **Service Group Name**: Escribe un nombre, por ejemplo: `inventario-prod`.
+    - **Branch**: Asegúrate que diga `main`.
+    - Verás una lista de recursos que se crearán:
+        - `inventory-db` (Database)
+        - `inventory-backend` (Web Service)
+        - `inventory-frontend` (Static Site)
+    - Haz clic en el botón azul **"Apply"** (o "Create Blueprint").
+
+4.  **Esperar Despliegue**:
+    - Render comenzará a crear los servicios en orden.
+    - Primero la base de datos, luego el backend, luego el frontend.
+    - Espera a que todos muestren estado **Deploy Succeeded** o estén en verde.
+
+5.  **Post-Despliegue (Crucial para que funcione)**:
+    - Una vez finalizado, sigue el paso 1 de "Cambios Necesarios Después del Despliegue" (arriba) para actualizar el `VITE_API_URL` en el frontend.
+    - Luego sigue el paso 4 para migrar los datos.
 
 ## Notas Adicionales
 
