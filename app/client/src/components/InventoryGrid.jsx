@@ -244,7 +244,10 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
             )}
 
             <div className="p-3 border-b border-zinc-800 flex justify-between items-center bg-zinc-900/50">
-                <h3 className="font-semibold text-lg">Records ({safeData.length})</h3>
+                <h3 className="font-semibold text-lg">
+                    Records ({safeData.length})
+                    <span className="text-zinc-400 text-sm ml-4 font-normal">Puedes modificar el ancho de las columnas a tu propia conveniencia</span>
+                </h3>
                 <div className="flex gap-2">
                     {hasUnsavedChanges && (
                         <button

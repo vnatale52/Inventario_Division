@@ -32,7 +32,7 @@ The script now:
 - **Initializes database tables** automatically (prevents build errors)
 - Creates user accounts for each username
 - Automatically adds an `admin` user with `ADMIN` role
-- Default password for all users: `password123`
+- Default password for all users: `123`
 
 **Running the seed script**:
 ```bash
@@ -131,13 +131,13 @@ Features:
    ```
 
 2. **Test as Inspector (Vincenzo)**:
-   - Login: `Vincenzo` / `password123`
+   - Login: `Vincenzo` / `123`
    - Verify: Only see records where INSPECTOR = "Vincenzo"
    - Test backup: Should only contain Vincenzo's records
    - Test layout: Save column widths, logout, login again - settings should persist
 
 3. **Test as Admin**:
-   - Login: `admin` / `password123`
+   - Login: `admin` / `123`
    - Verify: See all records (no filtering)
    - Click "Manage Users" button
    - Add a new row with test users
@@ -145,7 +145,7 @@ Features:
    - Verify users are created in database
 
 4. **Test filtering for other roles**:
-   - Login as: `Supervisor1` / `password123`
+   - Login as: `Supervisor1` / `123`
    - Verify: Only see records where SUPERVISOR = "Supervisor1"
 
 ### API Testing (Git Bash)
@@ -162,7 +162,7 @@ Or manually:
 # Login as admin
 TOKEN=$(curl -s -X POST http://localhost:3001/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"password123"}' | jq -r '.token')
+  -d '{"username":"admin","password":"123"}' | jq -r '.token')
 
 # Get users
 curl -s -X GET http://localhost:3001/api/users \
@@ -228,7 +228,7 @@ Inventario División/
 1. Edit `usuarios.csv`
 2. Add a new row with usernames for each role
 3. Run: `cd app/server && node seed_users.js`
-4. Users created with password `password123`
+4. Users created with password `123`
 
 #### Adding New Users via UI
 1. Login as `admin`
@@ -247,7 +247,7 @@ Inventario División/
 
 #### First Login
 - Username: Your name from the hierarchy (e.g., "Vincenzo")
-- Password: `password123`
+- Password: `123`
 - **Important**: Change your password after first login
 
 #### Customizing Layout
@@ -272,25 +272,25 @@ Inventario División/
 
 | Username | Role | Password |
 |----------|------|----------|
-| Vincenzo | INSPECTOR | password123 |
-| Carlos | INSPECTOR | password123 |
-| Juan | INSPECTOR | password123 |
-| Supervisor1 | SUPERVISOR | password123 |
-| Supervisor2 | SUPERVISOR | password123 |
-| Supervisor3 | SUPERVISOR | password123 |
-| RevisorDiv1 | REVISOR DIV | password123 |
-| RevisorDiv2 | REVISOR DIV | password123 |
-| RevisorDiv3 | REVISOR DIV | password123 |
-| Jefa1 | JEFE DIV | password123 |
-| Jefa2 | JEFE DIV | password123 |
-| Jefa3 | JEFE DIV | password123 |
-| RevisorDepto1 | REVISOR DEPTO | password123 |
-| RevisorDepto2 | REVISOR DEPTO | password123 |
-| RevisorDepto3 | REVISOR DEPTO | password123 |
-| RevisorDirec1 | REVISOR DIREC | password123 |
-| RevisorDirec2 | REVISOR DIREC | password123 |
-| RevisorDirec3 | REVISOR DIREC | password123 |
-| **admin** | **ADMIN** | **password123** |
+| Vincenzo | INSPECTOR | 123 |
+| Carlos | INSPECTOR | 123 |
+| Juan | INSPECTOR | 123 |
+| Supervisor1 | SUPERVISOR | 123 |
+| Supervisor2 | SUPERVISOR | 123 |
+| Supervisor3 | SUPERVISOR | 123 |
+| RevisorDiv1 | REVISOR DIV | 123 |
+| RevisorDiv2 | REVISOR DIV | 123 |
+| RevisorDiv3 | REVISOR DIV | 123 |
+| Jefa1 | JEFE DIV | 123 |
+| Jefa2 | JEFE DIV | 123 |
+| Jefa3 | JEFE DIV | 123 |
+| RevisorDepto1 | REVISOR DEPTO | 123 |
+| RevisorDepto2 | REVISOR DEPTO | 123 |
+| RevisorDepto3 | REVISOR DEPTO | 123 |
+| RevisorDirec1 | REVISOR DIREC | 123 |
+| RevisorDirec2 | REVISOR DIREC | 123 |
+| RevisorDirec3 | REVISOR DIREC | 123 |
+| **admin** | **ADMIN** | **123** |
 
 ## Troubleshooting
 

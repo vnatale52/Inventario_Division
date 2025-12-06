@@ -44,3 +44,13 @@ export const createBackup = async (username) => {
     const response = await api.post('/backup', { username }, { responseType: 'blob' });
     return response;
 };
+
+export const getUsers = async () => {
+    const response = await api.get('/users');
+    return response.data;
+};
+
+export const saveUsers = async (data) => {
+    const response = await api.post('/users', data);
+    return response.data;
+};

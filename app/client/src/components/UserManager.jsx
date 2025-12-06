@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Plus, Trash2, Save, AlertCircle } from 'lucide-react';
-import axios from 'axios';
+import { getUsers, saveUsers } from '../api';
 
 export const UserManager = ({ onClose }) => {
     const [roles, setRoles] = useState([]);
@@ -17,12 +17,9 @@ export const UserManager = ({ onClose }) => {
     const loadUsers = async () => {
         try {
             setLoading(true);
-            const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:3001/api/users', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setRoles(response.data.roles);
-            setUsers(response.data.users);
+            const data = await getUsers();
+            setRoles(data.roles);
+            setUsers(data.users);
             setError(null);
         } catch (err) {
             setError('Failed to load users: ' + (err.response?.data?.error || err.message));
@@ -66,11 +63,7 @@ export const UserManager = ({ onClose }) => {
                 return;
             }
 
-            const token = localStorage.getItem('token');
-            await axios.post('http://localhost:3001/api/users',
-                { roles, users },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            await saveUsers({ roles, users });
 
             setHasChanges(false);
             alert('Users saved successfully! Database has been updated.');

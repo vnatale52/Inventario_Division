@@ -44,7 +44,7 @@ const seedUsers = async () => {
 
         console.log(`Found ${users.length} users to seed`);
 
-        const password = 'password123'; // Default password
+        const password = '123'; // Default password
         const hashedPassword = await bcrypt.hash(password, 10);
 
         for (const user of users) {
@@ -57,11 +57,12 @@ const seedUsers = async () => {
                 );
                 console.log(`Created user: ${user.username} (${user.role})`);
             } else {
-                // Update role if changed
+                // Update role and password
                 await pool.query(
-                    'UPDATE users SET role = $2 WHERE username = $1',
-                    [user.username, user.role]
+                    'UPDATE users SET role = $2, password = $3 WHERE username = $1',
+                    [user.username, user.role, hashedPassword]
                 );
+                console.log(`Updated user: ${user.username} (${user.role}) - Password reset to default`);
                 console.log(`Updated user: ${user.username} (${user.role})`);
             }
         }
