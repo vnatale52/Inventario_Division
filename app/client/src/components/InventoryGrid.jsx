@@ -447,7 +447,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
                                     <td key={`add-${col.id}-${index}`} className="px-4 py-3 border border-yellow-500 overflow-hidden bg-white">
                                         <input
                                             className="bg-white border text-gray-900 border-yellow-300 rounded px-2 py-1 w-full text-xs focus:outline-none focus:border-yellow-600 font-medium"
-                                            value={editForm[col.label] || ''}
+                                            value={(editForm && editForm[col.label]) || ''}
                                             onChange={(e) => handleChange(col.label, e.target.value)}
                                             placeholder={col.label}
                                         />
