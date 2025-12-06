@@ -300,9 +300,9 @@ Detalles del registro seleccionado:
 - Supervisor: ${row['SUPERVISOR'] || 'N/A'}
 - Estado: ${row['Estado'] || 'N/A'}
 
-Links (a través del link Bonus 6):
-- Inventario: https://inventory-frontend-4e4b.onrender.com/
-- Carga Balances: https://carga-balances.onrender.com/
+Links:
+- Inventario:      https://inventory-frontend-4e4b.onrender.com/
+- Carga Balances:  https://carga-balances.onrender.com/           (a través del link Bonus 6)
 
 Saludos cordiales,
 Sistema de Inventario`;
