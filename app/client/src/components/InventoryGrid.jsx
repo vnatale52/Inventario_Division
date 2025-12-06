@@ -420,12 +420,10 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
                                         <span className="font-semibold text-zinc-200 text-[11px] break-words">{col.label}</span>
                                         {col.type && <span className="text-[10px] text-zinc-500 font-normal break-words">{col.type}</span>}
                                     </div>
-                                    {/* Resize handle */}
                                     <div
                                         className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-primary-500 opacity-0 group-hover:opacity-100 transition-opacity"
                                         onMouseDown={(e) => startResizing(e, col.label)}
                                     />
-                                    {/* Header height resize handle - visible on all columns */}
                                     <div
                                         className="absolute left-0 right-0 cursor-row-resize hover:bg-green-500 z-40 bg-green-500/40"
                                         style={{ bottom: '-2px', height: '6px' }}
@@ -435,7 +433,6 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
                                 </th>
                             ))}
                         </tr>
-
                     </thead>
                     <tbody className="bg-slate-400">
                         {isAdding && (
@@ -511,7 +508,7 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
                         })}
                     </tbody>
                 </table>
-            </div>
+            </div >
         </div >
     );
 };
