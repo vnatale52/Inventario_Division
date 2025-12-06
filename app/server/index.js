@@ -232,7 +232,7 @@ app.post('/api/backup', authenticateToken, async (req, res) => {
 
         // Send as download
         res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        res.setHeader('Content-Disposition', 'attachment; filename="' + filename + '"');
         res.send(csvContent);
 
     } catch (error) {
