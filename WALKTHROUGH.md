@@ -120,6 +120,14 @@ Features:
 - Opens UserManager modal when clicked
 - Located in the header next to Backup and Logout buttons
 
+### 7. Data Integrity Validation ✅
+
+**File**: [InventoryGrid.jsx](file:///c:/Users/vn/Desktop/Inventario%20Divisi%C3%B3n/app/client/src/components/InventoryGrid.jsx)
+
+- **User Existence Check**: When adding or editing records, the system validates that the values entered for user columns (INSPECTOR, SUPERVISOR, etc.) exactly match usage in `usuarios.csv`.
+- **Feedback**: If an invalid username is entered, an alert prevents saving and lists the valid options for that role.
+- **Auto-Increment**: New records automatically populate the `Orden` column with the next available number (Max + 1).
+
 ## Testing
 
 ### Manual Testing Steps

@@ -3,6 +3,7 @@ import { Plus, Trash2, Save, X, Mail, Settings } from 'lucide-react';
 import clsx from 'clsx';
 import { ColumnManager } from './ColumnManager';
 import axios from 'axios';
+import { getUsers } from '../api';
 
 // Helper to determine initial width based on column name
 const getInitialWidth = (label) => {
@@ -43,6 +44,29 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
     const resizingRef = useRef(null);
     const headerResizingRef = useRef(null);
     const headerHeightRef = useRef(headerHeight); // Keep ref in sync with state
+
+    // Validation state
+    const [validUsers, setValidUsers] = useState(null);
+
+    // Load valid users for validation
+    useEffect(() => {
+        const loadValidUsers = async () => {
+            try {
+                const data = await getUsers();
+                // Transform to map: Role -> Set of usernames
+                const map = {};
+                if (data.roles && data.users) {
+                    data.roles.forEach((role, index) => {
+                        map[role] = new Set(data.users.map(row => row[index]).filter(u => u && u.trim() !== ''));
+                    });
+                }
+                setValidUsers(map);
+            } catch (e) {
+                console.error('Failed to load users for validation', e);
+            }
+        };
+        loadValidUsers();
+    }, []);
 
     // Safety checks - force new array instances
     const safeData = Array.isArray(data) ? [...data].filter(Boolean) : [];
@@ -121,31 +145,26 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
     }, [columnWidths, username]);
 
     const startHeaderResizing = useCallback((e) => {
-        console.log('startHeaderResizing called', e);
         e.preventDefault();
         e.stopPropagation();
 
         const currentHeight = headerHeightRef.current;
-        console.log('Current header height:', currentHeight);
 
         headerResizingRef.current = {
             startY: e.clientY,
             startHeight: currentHeight
         };
-        console.log('Header resize started:', headerResizingRef.current);
 
         const onMouseMove = (moveEvent) => {
             if (headerResizingRef.current) {
                 const diff = moveEvent.clientY - headerResizingRef.current.startY;
-                const newHeight = Math.max(10, headerResizingRef.current.startHeight + diff); // Min height reduced to 10px
-                console.log('Moving:', { diff, newHeight });
+                const newHeight = Math.max(10, headerResizingRef.current.startHeight + diff);
                 setHeaderHeight(newHeight);
                 setHasUnsavedChanges(true);
             }
         };
 
         const onMouseUp = () => {
-            console.log('Mouse up - resize ended');
             headerResizingRef.current = null;
             document.removeEventListener('mousemove', onMouseMove);
             document.removeEventListener('mouseup', onMouseUp);
@@ -157,18 +176,20 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
         document.body.style.cursor = 'row-resize';
     }, []);
 
-    const handleEdit = (row) => {
-        setEditingId(row._id);
-        setEditForm(row);
-    };
-
-    const handleCancel = () => {
-        setEditingId(null);
-        setEditForm({});
-        setIsAdding(false);
-    };
-
     const handleSave = () => {
+        // Validation
+        if (validUsers) {
+            for (const [key, value] of Object.entries(editForm)) {
+                // If the column name matches a known Role and a value is entered
+                if (validUsers[key] && value && value.trim() !== '') {
+                    if (!validUsers[key].has(value.trim())) {
+                        alert(`Error: El usuario "${value}" no es válido para el rol ${key}.\n\nUsuarios válidos:\n${Array.from(validUsers[key]).join(', ')}`);
+                        return; // Stop save
+                    }
+                }
+            }
+        }
+
         if (isAdding) {
             onUpdate('ADD', editForm);
         } else {

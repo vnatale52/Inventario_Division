@@ -286,25 +286,6 @@ app.post('/api/users', authenticateToken, async (req, res) => {
         }
 
         const { roles, users } = req.body;
-
-        if (!roles || !users) {
-            return res.status(400).json({ error: 'Invalid request. Roles and users required.' });
-        }
-
-        const fs = require('fs');
-        const path = require('path');
-        const { execSync } = require('child_process');
-        const usuariosPath = path.join(__dirname, '../../usuarios.csv');
-
-        // Build CSV content
-        const lines = [roles.join(';')];
-        users.forEach(userRow => {
-            lines.push(userRow.join(';'));
-        });
-
-        const csvContent = lines.join('\n');
-
-        // Write to file
         fs.writeFileSync(usuariosPath, csvContent, 'utf-8');
 
         // Re-seed users in database
