@@ -188,7 +188,16 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
     const startAdd = () => {
         setIsAdding(true);
         setEditingId('new');
-        setEditForm({});
+
+        // Calculate next Orden value
+        const maxOrden = safeData.reduce((max, row) => {
+            const val = parseInt(row['Orden'] || 0);
+            return val > max ? val : max;
+        }, 0);
+
+        setEditForm({
+            'Orden': (maxOrden + 1).toString()
+        });
     };
 
     const handleChange = (colLabel, value) => {
@@ -372,11 +381,8 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
                                         </div>
                                     </td>
                                     {safeColumns.map((col, colIndex) => {
-                                        // Auto-generate order number for "Orden" column
+                                        // Use stored value for Orden
                                         let val = getValue(row, col.label);
-                                        if (col.label === 'Orden') {
-                                            val = rowIndex + 1; // Auto-generate sequential order starting from 1
-                                        }
 
                                         return (
                                             <td key={`cell-${row._id}-${col.id}-${colIndex}`} className={clsx("px-4 py-3 whitespace-nowrap border border-slate-500 overflow-hidden max-w-0", isFinancialColumn(col.label) && "text-right")}>

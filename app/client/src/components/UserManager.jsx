@@ -54,11 +54,13 @@ export const UserManager = ({ onClose }) => {
             setSaving(true);
             setError(null);
 
-            // Validate: check for duplicate usernames
-            const allUsernames = users.flat().filter(u => u.trim() !== '');
-            const uniqueUsernames = new Set(allUsernames);
-            if (allUsernames.length !== uniqueUsernames.size) {
-                setError('Duplicate usernames detected. Each username must be unique.');
+            // Validate: check for duplicate usernames ONLY for INSPECTOR (first column)
+            // Other roles (SUPERVISOR, etc.) can have repeated usernames
+            const inspectorUsernames = users.map(row => row[0]).filter(u => u && u.trim() !== '');
+            const uniqueInspectors = new Set(inspectorUsernames);
+
+            if (inspectorUsernames.length !== uniqueInspectors.size) {
+                setError('Duplicate usernames detected in INSPECTOR role. Each INSPECTOR must be unique.');
                 setSaving(false);
                 return;
             }
