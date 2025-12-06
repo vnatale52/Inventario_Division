@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Plus, Trash2, Save, X, Mail, Settings } from 'lucide-react';
+import { Plus, Trash2, Save, X, Mail, Settings, Users } from 'lucide-react';
 import clsx from 'clsx';
 import { ColumnManager } from './ColumnManager';
 import axios from 'axios';
@@ -47,6 +47,8 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
 
     // Validation state
     const [validUsers, setValidUsers] = useState(null);
+    const [showUserList, setShowUserList] = useState(false);
+    const tableContainerRef = useRef(null);
 
     // Load valid users for validation
     useEffect(() => {
@@ -210,6 +212,11 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
         setIsAdding(true);
         setEditingId('new');
 
+        // Scroll to top to ensure new row is visible
+        if (tableContainerRef.current) {
+            tableContainerRef.current.scrollTop = 0;
+        }
+
         // Calculate next Orden value
         const maxOrden = safeData.reduce((max, row) => {
             const val = parseInt(row['Orden'] || 0);
@@ -264,7 +271,37 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
     };
 
     return (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden shadow-xl">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden shadow-xl relative">
+            {showUserList && validUsers && (
+                <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+                    <div className="bg-zinc-800 border border-zinc-700 p-6 rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto flex flex-col">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                                <Users className="text-primary-400" />
+                                Usuarios Válidos Cargados
+                            </h2>
+                            <button onClick={() => setShowUserList(false)} className="text-zinc-400 hover:text-white transition-colors">
+                                <X size={24} />
+                            </button>
+                        </div>
+                        <div className="space-y-6 flex-1 overflow-y-auto pr-2">
+                            {Object.entries(validUsers).map(([role, users]) => (
+                                <div key={role} className="bg-zinc-900/50 p-4 rounded-lg border border-zinc-700/50">
+                                    <h3 className="font-semibold text-primary-400 mb-2 text-sm uppercase tracking-wider">{role}</h3>
+                                    <div className="flex flex-wrap gap-2">
+                                        {Array.from(users).sort().map(user => (
+                                            <span key={user} className="px-2 py-1 bg-zinc-700/50 text-zinc-200 text-xs rounded border border-zinc-700">
+                                                {user}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {showColManager && (
                 <ColumnManager
                     columns={safeColumns}
@@ -289,6 +326,15 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
                             Save Layout
                         </button>
                     )}
+                    {role === 'ADMIN' && (
+                        <button
+                            onClick={() => setShowUserList(true)}
+                            className="flex items-center gap-2 px-4 py-2 bg-purple-700 hover:bg-purple-600 text-white rounded-lg transition-colors"
+                        >
+                            <Users size={18} />
+                            Ver Usuarios
+                        </button>
+                    )}
                     <button
                         onClick={() => setShowColManager(true)}
                         className="flex items-center gap-2 px-4 py-2 bg-teal-700 hover:bg-teal-600 text-white rounded-lg transition-colors"
@@ -307,7 +353,9 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
                 </div>
             </div>
 
-            <div className="overflow-x-auto max-h-[calc(100vh-200px)] border-t border-zinc-700" style={{ scrollbarWidth: 'thin' }}>
+
+
+            <div ref={tableContainerRef} className="overflow-x-auto max-h-[calc(100vh-200px)] border-t border-zinc-700" style={{ scrollbarWidth: 'thin' }}>
                 <table className="w-full text-sm text-left border-collapse table-fixed">
                     <thead className="text-xs text-white uppercase bg-slate-700 sticky top-0 z-10">
                         <tr className="relative">
@@ -434,6 +482,6 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
                     </tbody>
                 </table>
             </div>
-        </div>
+        </div >
     );
 };

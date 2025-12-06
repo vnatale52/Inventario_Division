@@ -126,6 +126,7 @@ Features:
 
 - **User Existence Check**: When adding or editing records, the system validates that the values entered for user columns (INSPECTOR, SUPERVISOR, etc.) exactly match usage in `usuarios.csv`.
 - **Feedback**: If an invalid username is entered, an alert prevents saving and lists the valid options for that role.
+- **View Valid Users**: Admins have a new button "Ver Usuarios" to see a list of all valid users per role directly in the grid view.
 - **Auto-Increment**: New records automatically populate the `Orden` column with the next available number (Max + 1).
 
 ## Testing
