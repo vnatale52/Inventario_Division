@@ -242,6 +242,12 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
         setIsAdding(false);
     };
 
+    const handleEdit = (row) => {
+        setEditingId(row._id);
+        setEditForm({ ...row });
+        setIsAdding(false);
+    };
+
     const handleChange = (colLabel, value) => {
         setEditForm(prev => ({ ...prev, [colLabel]: value }));
     };
