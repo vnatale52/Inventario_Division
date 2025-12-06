@@ -215,23 +215,37 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
     };
 
     const startAdd = () => {
-        setIsAdding(true);
-        setEditingId('new');
+        try {
+            setIsAdding(true);
+            setEditingId('new');
 
-        // Scroll to top to ensure new row is visible
-        if (tableContainerRef.current) {
-            tableContainerRef.current.scrollTop = 0;
+            // Attempt scroll safely
+            try {
+                if (tableContainerRef.current) {
+                    tableContainerRef.current.scrollTop = 0;
+                }
+            } catch (scrollErr) {
+                console.warn('Scroll to top failed:', scrollErr);
+            }
+
+            // Calculate next Orden value safely
+            let maxOrden = 0;
+            if (safeData && safeData.length > 0) {
+                maxOrden = safeData.reduce((max, row) => {
+                    if (!row) return max;
+                    const val = parseInt(row['Orden']);
+                    const num = isNaN(val) ? 0 : val;
+                    return num > max ? num : max;
+                }, 0);
+            }
+
+            setEditForm({
+                'Orden': (maxOrden + 1).toString()
+            });
+        } catch (e) {
+            console.error('Error starting add record:', e);
+            alert('Error initiating add record. Please refresh and try again.');
         }
-
-        // Calculate next Orden value
-        const maxOrden = safeData.reduce((max, row) => {
-            const val = parseInt(row['Orden'] || 0);
-            return val > max ? val : max;
-        }, 0);
-
-        setEditForm({
-            'Orden': (maxOrden + 1).toString()
-        });
     };
 
     const handleChange = (colLabel, value) => {
@@ -439,7 +453,6 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
                                             value={editForm[col.label] || ''}
                                             onChange={(e) => handleChange(col.label, e.target.value)}
                                             placeholder={col.label}
-                                            autoFocus={index === 0}
                                         />
                                     </td>
                                 ))}
