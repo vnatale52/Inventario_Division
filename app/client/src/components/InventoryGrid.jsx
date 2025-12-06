@@ -215,11 +215,31 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
     };
 
     const startAdd = () => {
-        console.log('startAdd called');
-        setEditForm({ 'Orden': '1' });
+        // Scroll to top to ensure new row is visible
+        if (tableContainerRef.current) {
+            tableContainerRef.current.scrollTop = 0;
+        }
+
+        // Calculate next Orden value
+        let maxOrden = 0;
+        if (safeData && safeData.length > 0) {
+            maxOrden = safeData.reduce((max, row) => {
+                if (!row) return max;
+                const val = parseInt(row['Orden']);
+                const num = isNaN(val) ? 0 : val;
+                return num > max ? num : max;
+            }, 0);
+        }
+
+        setEditForm({ 'Orden': (maxOrden + 1).toString() });
         setEditingId('new');
         setIsAdding(true);
-        console.log('startAdd completed');
+    };
+
+    const handleCancel = () => {
+        setEditingId(null);
+        setEditForm({});
+        setIsAdding(false);
     };
 
     const handleChange = (colLabel, value) => {
