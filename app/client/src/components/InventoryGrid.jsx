@@ -256,12 +256,18 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
 
     const handleEmail = async (row) => {
         try {
-            const res = await axios.post('http://localhost:3001/api/email', { row });
+            const token = localStorage.getItem('token');
+            const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+            const res = await axios.post(`${API_BASE_URL}/api/email`, { row }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             const { subject, body } = res.data;
             const mailto = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
             window.location.href = mailto;
         } catch (e) {
-            alert('Error generating email');
+            console.error('Email error:', e);
+            const errorMsg = e.response?.data?.error || e.message || 'Error desconocido';
+            alert(`Error al generar email: ${errorMsg}\n\nPor favor, verifica que el servidor esté funcionando correctamente.`);
         }
     };
 
