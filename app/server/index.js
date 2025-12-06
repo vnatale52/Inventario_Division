@@ -285,7 +285,19 @@ app.post('/api/users', authenticateToken, async (req, res) => {
             return res.status(403).json({ error: 'Access denied. Admin only.' });
         }
 
+        const fs = require('fs');
+        const path = require('path');
+        const { execSync } = require('child_process');
+        const usuariosPath = path.join(__dirname, '../../usuarios.csv');
+
         const { roles, users } = req.body;
+
+        // Construct CSV content
+        const headerLine = roles.join(';');
+        const dataLines = users.map(row => row.join(';'));
+        const csvContent = [headerLine, ...dataLines].join('\n');
+
+        // Write to file
         fs.writeFileSync(usuariosPath, csvContent, 'utf-8');
 
         // Re-seed users in database
