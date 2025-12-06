@@ -258,12 +258,54 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
         try {
             const token = localStorage.getItem('token');
             const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-            const res = await axios.post(`${API_BASE_URL}/api/email`, { row }, {
-                headers: { Authorization: `Bearer ${token}` }
+
+            // First, trigger the backup download
+            const backupResponse = await axios.post(`${API_BASE_URL}/api/backup`, {}, {
+                headers: { Authorization: `Bearer ${token}` },
+                responseType: 'blob'
             });
-            const { subject, body } = res.data;
+
+            // Get filename from Content-Disposition header
+            const contentDisposition = backupResponse.headers['content-disposition'];
+            let filename = 'backup.csv';
+            if (contentDisposition) {
+                const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+                if (filenameMatch) {
+                    filename = filenameMatch[1];
+                }
+            }
+
+            // Create download link
+            const url = window.URL.createObjectURL(new Blob([backupResponse.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', filename);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+
+            // Now open email client with message
+            const subject = `Backup de Inventario - ${new Date().toLocaleDateString('es-AR')}`;
+            const body = `Estimado/a,
+
+Adjunto encontrará el backup de inventario solicitado.
+
+El archivo "${filename}" ha sido descargado automáticamente en su carpeta de descargas.
+Por favor, adjúntelo a este email antes de enviarlo.
+
+Detalles del registro seleccionado:
+- Orden: ${row['Orden'] || 'N/A'}
+- Inspector: ${row['INSPECTOR'] || 'N/A'}
+- Supervisor: ${row['SUPERVISOR'] || 'N/A'}
+- Estado: ${row['Estado'] || 'N/A'}
+
+Saludos cordiales,
+Sistema de Inventario`;
+
             const mailto = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
             window.location.href = mailto;
+
         } catch (e) {
             console.error('Email error:', e);
             const errorMsg = e.response?.data?.error || e.message || 'Error desconocido';
