@@ -200,8 +200,10 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
 
         if (isAdding) {
             onUpdate('ADD', editForm);
+            alert('✅ Registro agregado exitosamente');
         } else {
             onUpdate('UPDATE', editForm);
+            alert('✅ Registro actualizado exitosamente');
         }
         setEditingId(null);
         setEditForm({});
