@@ -226,6 +226,18 @@ app.post('/api/backup', authenticateToken, async (req, res) => {
 
         const pad = (n) => n.toString().padStart(2, '0');
         const dateStr = `${pad(argentinaTime.getDate())}-${pad(argentinaTime.getMonth() + 1)}-${argentinaTime.getFullYear()}`;
+        const timeStr = `${pad(argentinaTime.getHours())}-${pad(argentinaTime.getMinutes())}-${pad(argentinaTime.getSeconds())}`;
+
+        const filename = `${authenticatedUsername}_backup_${dateStr}_${timeStr}.csv`;
+
+        // Send as download
+        res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        res.send(csvContent);
+
+    } catch (error) {
+        console.error('Backup error:', error);
+        res.status(500).json({ error: 'Backup failed' });
     }
 });
 
