@@ -215,37 +215,11 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
     };
 
     const startAdd = () => {
-        try {
-            setIsAdding(true);
-            setEditingId('new');
-
-            // Attempt scroll safely
-            try {
-                if (tableContainerRef.current) {
-                    tableContainerRef.current.scrollTop = 0;
-                }
-            } catch (scrollErr) {
-                console.warn('Scroll to top failed:', scrollErr);
-            }
-
-            // Calculate next Orden value safely
-            let maxOrden = 0;
-            if (safeData && safeData.length > 0) {
-                maxOrden = safeData.reduce((max, row) => {
-                    if (!row) return max;
-                    const val = parseInt(row['Orden']);
-                    const num = isNaN(val) ? 0 : val;
-                    return num > max ? num : max;
-                }, 0);
-            }
-
-            setEditForm({
-                'Orden': (maxOrden + 1).toString()
-            });
-        } catch (e) {
-            console.error('Error starting add record:', e);
-            alert('Error initiating add record. Please refresh and try again.');
-        }
+        console.log('startAdd called');
+        setEditForm({ 'Orden': '1' });
+        setEditingId('new');
+        setIsAdding(true);
+        console.log('startAdd completed');
     };
 
     const handleChange = (colLabel, value) => {
