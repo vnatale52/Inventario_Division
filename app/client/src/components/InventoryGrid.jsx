@@ -264,18 +264,6 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
                 headers: { Authorization: `Bearer ${token}` },
                 responseType: 'blob'
             });
-
-            // Get filename from Content-Disposition header
-            const contentDisposition = backupResponse.headers['content-disposition'];
-            let filename = 'backup.csv';
-            if (contentDisposition) {
-                const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
-                if (filenameMatch) {
-                    filename = filenameMatch[1];
-                }
-            }
-
-            // Create download link
             const url = window.URL.createObjectURL(new Blob([backupResponse.data]));
             const link = document.createElement('a');
             link.href = url;
