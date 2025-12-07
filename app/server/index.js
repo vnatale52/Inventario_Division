@@ -286,10 +286,10 @@ app.post('/api/backup', authenticateToken, async (req, res) => {
 
 app.get('/api/users', authenticateToken, async (req, res) => {
     try {
-        // Check if user is admin
-        if (req.user.role !== 'ADMIN') {
-            return res.status(403).json({ error: 'Access denied. Admin only.' });
-        }
+        // Allow all authenticated users to read users for validation purposes
+        // if (req.user.role !== 'ADMIN') {
+        //     return res.status(403).json({ error: 'Access denied. Admin only.' });
+        // }
 
         const fs = require('fs');
         const path = require('path');
