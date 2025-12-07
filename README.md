@@ -5,6 +5,8 @@ Aplicación web completa para administrar el inventario de expedientes administr
 ## 🌟 Características Principales
 
 - ✅ **Gestión de Usuarios Dinámica** - Usuarios definidos en CSV, sin código hardcoded
+- ✅ **Cambio de Contraseña** - Todos los usuarios pueden cambiar su contraseña cuando quieran
+- ✅ **Columnas Dinámicas** - Definiciones de columnas cargadas desde columnas.csv (no hardcoded)
 - ✅ **Filtrado por Roles** - Cada usuario solo ve sus propios registros
 - ✅ **Interfaz de Administración** - Panel web para gestionar usuarios (solo ADMIN)
 - ✅ **Layouts Personalizados** - Cada usuario guarda sus preferencias de columnas
@@ -236,6 +238,30 @@ Iniciar sesión
 }
 ```
 
+#### `POST /api/auth/change-password`
+Cambiar contraseña del usuario autenticado
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Body:**
+```json
+{
+  "currentPassword": "password123",
+  "newPassword": "newSecurePassword"
+}
+```
+
+**Respuesta:**
+```json
+{
+  "success": true,
+  "message": "Password changed successfully"
+}
+```
+
 ### Datos de Inventario
 
 #### `GET /api/data`
@@ -413,12 +439,28 @@ Carlos;Supervisor2;RevisorDiv2
 ```
 
 ### columnas.csv
-Define el esquema de las columnas. Campos:
+Define el esquema de las columnas **dinámicamente** (NO hardcoded). Campos:
 - Número Columna
 - Descripción
-- Tipo de dato
-- Longitud
-- Obligatorio
+- Tipo de dato (opcional)
+- Longitud (opcional)
+- Obligatorio (opcional)
+
+**Importante:** Las columnas se leen desde este archivo durante la migración inicial y se almacenan en la base de datos PostgreSQL. El sistema es completamente dinámico - modificar este archivo y re-migrar actualizará las columnas automáticamente.
+
+**Flujo de datos:**
+1. `columnas.csv` → Script de migración (`migrate_csv_to_pg.js`)
+2. Script lee el CSV y guarda en tabla `columns` de PostgreSQL
+3. API endpoint `/api/data` consulta la base de datos
+4. Frontend renderiza columnas dinámicamente
+
+**Para modificar columnas:**
+```bash
+# 1. Editar columnas.csv
+# 2. Re-migrar
+cd app/server
+node migrate_csv_to_pg.js
+```
 
 ### Inventario.csv
 Contiene los datos del inventario. Formato:

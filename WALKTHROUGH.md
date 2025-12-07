@@ -5,7 +5,49 @@ This walkthrough documents the complete implementation of the user management an
 
 ## Features Implemented
 
-### 1. User Hierarchy Management ✅
+### 1. Password Change System ✅
+
+**Files**: 
+- [ChangePassword.jsx](file:///c:/Users/vn/Desktop/Inventario%20División/app/client/src/components/ChangePassword.jsx)
+- [index.js](file:///c:/Users/vn/Desktop/Inventario%20División/app/server/index.js) (endpoint `/api/auth/change-password`)
+
+**Implementation:**
+- Modal component with password visibility toggles
+- Client-side validation (minimum 6 characters, passwords match, different from current)
+- Server-side validation of current password
+- Secure password hashing with bcrypt (10 salt rounds)
+- Available to all users (including admin)
+- Users can change password unlimited times
+
+**How to use:**
+1. Click "Cambiar Contraseña" button in header (blue button with key icon)
+2. Enter current password
+3. Enter and confirm new password
+4. Click "Cambiar Contraseña" to save
+
+### 2. Dynamic Column Definitions ✅
+
+**Files**:
+- [columnas.csv](file:///c:/Users/vn/Desktop/Inventario%20División/columnas.csv) - Source of truth
+- [migrate_csv_to_pg.js](file:///c:/Users/vn/Desktop/Inventario%20División/app/server/migrate_csv_to_pg.js) - Migration script
+
+**Important:** Column definitions are **NOT hardcoded** anywhere in the codebase. They are:
+1. Read from `columnas.csv` during initial migration
+2. Stored in PostgreSQL `columns` table
+3. Dynamically loaded via API endpoint `/api/data`
+4. Rendered dynamically in the frontend
+
+**Data flow:**
+```
+columnas.csv → migrate_csv_to_pg.js → PostgreSQL columns table → API → Frontend
+```
+
+**To modify columns:**
+1. Edit `columnas.csv`
+2. Run migration: `cd app/server && node migrate_csv_to_pg.js`
+3. Columns update automatically
+
+### 3. User Hierarchy Management ✅
 
 **File**: [usuarios.csv](file:///c:/Users/vn/Desktop/Inventario%20Divisi%C3%B3n/usuarios.csv)
 
