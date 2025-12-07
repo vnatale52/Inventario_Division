@@ -29,6 +29,11 @@ function App() {
     enabled: !!user, // Only fetch if user is logged in
   });
 
+  // Debug logging
+  useEffect(() => {
+    console.log('App State:', { user, isLoading, error, hasData: !!data });
+  }, [user, isLoading, error, data]);
+
   const mutation = useMutation({
     mutationFn: ({ type, row, column }) => {
       if (type === 'COLUMN_ADD') {
@@ -68,10 +73,33 @@ function App() {
   }
 
   if (error) {
+    console.error('Data loading error:', error);
     return (
-      <div className="h-screen w-full flex items-center justify-center bg-zinc-950 text-red-500">
-        Error loading data. Please check if the server is running.
-        <button onClick={() => window.location.reload()} className="ml-4 underline">Retry</button>
+      <div className="h-screen w-full flex flex-col items-center justify-center bg-zinc-950 text-white p-6">
+        <div className="max-w-md text-center">
+          <h2 className="text-2xl font-bold text-red-500 mb-4">Error al cargar datos</h2>
+          <p className="text-zinc-400 mb-2">No se pudo conectar con el servidor.</p>
+          <p className="text-zinc-500 text-sm mb-6">
+            {error?.message || 'Error desconocido'}
+          </p>
+          <div className="flex gap-4 justify-center">
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-primary-600 hover:bg-primary-500 rounded-lg transition-colors"
+            >
+              Reintentar
+            </button>
+            <button
+              onClick={() => {
+                localStorage.clear();
+                window.location.reload();
+              }}
+              className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 rounded-lg transition-colors"
+            >
+              Cerrar Sesión
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
