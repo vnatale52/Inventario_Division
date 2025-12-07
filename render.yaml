@@ -28,7 +28,7 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_URL
-        value: https://inventory-backend.onrender.com # You will need to update this with the actual URL after deployment
+        value: https://inventory-backend-up6a.onrender.com
 
 databases:
   - name: inventory-db
