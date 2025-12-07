@@ -208,19 +208,18 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
         }
     };
 
-    // Check if current user is valid (exists in usuarios.csv)
+    // Check if current user is valid (exists in usuarios.csv) or is ADMIN
     const isUserValid = () => {
-        if (!validUsers || !username) {
-            console.log('Validation failed: missing data', { validUsers: !!validUsers, username });
-            return false;
-        }
+        // Admins are always allowed
+        if (role === 'ADMIN') return true;
+
+        if (!validUsers || !username) return false;
         // Check if username exists in any role
         for (const role in validUsers) {
             if (validUsers[role].has(username)) {
                 return true;
             }
         }
-        console.log('Validation failed: User not found in validUsers', { username, roles: Object.keys(validUsers) });
         return false;
     };
 
