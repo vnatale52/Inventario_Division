@@ -208,6 +208,18 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
         }
     };
 
+    // Check if current user is valid (exists in usuarios.csv)
+    const isUserValid = () => {
+        if (!validUsers || !username) return false;
+        // Check if username exists in any role
+        for (const role in validUsers) {
+            if (validUsers[role].has(username)) {
+                return true;
+            }
+        }
+        return false;
+    };
+
     const startAdd = () => {
         // Check if user is valid before allowing add
         if (!isUserValid()) {
@@ -250,18 +262,6 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
 
     const handleChange = (colLabel, value) => {
         setEditForm(prev => ({ ...prev, [colLabel]: value }));
-    };
-
-    // Check if current user is valid (exists in usuarios.csv)
-    const isUserValid = () => {
-        if (!validUsers || !username) return false;
-        // Check if username exists in any role
-        for (const role in validUsers) {
-            if (validUsers[role].has(username)) {
-                return true;
-            }
-        }
-        return false;
     };
 
     const handleEmail = async (row) => {
