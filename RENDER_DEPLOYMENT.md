@@ -92,11 +92,24 @@ Después del despliegue, verifica:
 
 ## Resumen de Cambios en render.yaml
 
-```yaml
-buildCommand: npm install && node seed_users.js  # ← Agregado seeding
-```
+### Comandos de Construcción (Build Commands)
 
-Esto asegura que los usuarios se creen automáticamente cada vez que se despliega.
+Estos comandos se ejecutan automáticamente en cada despliegue:
+
+**Backend (`inventory-backend`):**
+```bash
+npm install && node seed_users.js && node migrate_csv_to_pg.js
+```
+- `npm install`: Instala dependencias.
+- `node seed_users.js`: Crea/actualiza usuarios desde `usuarios.csv` (idempotente).
+- `node migrate_csv_to_pg.js`: Carga `Inventario.csv` **SOLO si la base de datos está vacía**. Nunca sobrescribe datos existentes.
+
+**Frontend (`inventory-frontend`):**
+```bash
+rm -rf node_modules dist && npm install && npm run build
+```
+- Limpia instalaciones previas (`rm -rf ...`) para evitar errores de caché.
+- Instala dependencias y construye la aplicación estática (`npm run build`).
 
 ## Pasos Detallados para Desplegar (Blueprint)
 

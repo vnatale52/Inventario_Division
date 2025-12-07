@@ -360,6 +360,40 @@ Inventario División/
 - Check browser console for errors
 - Ensure server is running on port 3001
 
+
+## Data Persistence & Deployment Details
+
+### CSV Data Safety
+A common question is whether the CSV files (`Inventario.csv`, `columnas.csv`, `usuarios.csv`) overwrite database data when the server restarts or redeploys.
+
+**The Answer: NO. Your data is safe.**
+
+1.  **`Inventario.csv` & `columnas.csv`**:
+    *   These are used **ONLY** for the initial database population.
+    *   The migration script (`migrate_csv_to_pg.js`) checks if the database contains data.
+    *   If the database has data, the script **SKIPS** the migration entirely. It will never overwrite your production data.
+
+2.  **`usuarios.csv`**:
+    *   This file is used by `seed_users.js` to ensure default users and roles exist.
+    *   It updates existing users' roles but does **NOT** delete users created via the Admin UI.
+    *   Changes made via the Admin UI (Web) are saved to the PostgreSQL database and are **persistent**.
+
+### Render Build Commands
+In `render.yaml`, the following `buildCommand`s are defined to automate this process safely:
+
+**Backend Service (`inventory-backend`):**
+```bash
+npm install && node seed_users.js && node migrate_csv_to_pg.js
+```
+*   `seed_users.js`: Ensures admin and default users exist.
+*   `migrate_csv_to_pg.js`: Safely attempts migration (skips if DB is not empty).
+
+**Frontend Service (`inventory-frontend`):**
+```bash
+rm -rf node_modules dist && npm install && npm run build
+```
+*   Forces a clean install and build to prevent caching issues.
+
 ## Summary
 
 ✅ **User Management**: Dynamic CSV-based user hierarchy  
@@ -368,5 +402,6 @@ Inventario División/
 ✅ **Admin Interface**: Web UI for managing users  
 ✅ **No Hardcoded Values**: All configuration in CSV files  
 ✅ **Secure**: JWT authentication, bcrypt passwords, role-based access control
+✅ **Data Safe**: CSVs serve as initial seeds only; they do not overwrite production data.
 
 The system is now fully functional and ready for production use!
