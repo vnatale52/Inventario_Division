@@ -210,13 +210,17 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
 
     // Check if current user is valid (exists in usuarios.csv)
     const isUserValid = () => {
-        if (!validUsers || !username) return false;
+        if (!validUsers || !username) {
+            console.log('Validation failed: missing data', { validUsers: !!validUsers, username });
+            return false;
+        }
         // Check if username exists in any role
         for (const role in validUsers) {
             if (validUsers[role].has(username)) {
                 return true;
             }
         }
+        console.log('Validation failed: User not found in validUsers', { username, roles: Object.keys(validUsers) });
         return false;
     };
 
