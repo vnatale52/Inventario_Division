@@ -39,9 +39,14 @@ export const Login = ({ onLogin }) => {
     return (
         <div className="min-h-screen flex items-center justify-center bg-zinc-950 p-4">
             <div className="w-full max-w-md bg-zinc-900 rounded-xl border border-zinc-800 p-8 shadow-2xl">
-                <h2 className="text-3xl font-bold text-white mb-6 text-center">
+                <h2 className="text-3xl font-bold text-white mb-2 text-center">
                     {isRegistering ? 'Create Account' : 'Welcome Back'}
                 </h2>
+                {!isRegistering && (
+                    <p className="text-zinc-400 text-center mb-6 text-sm">
+                        Administración del Inventario de Expedientes de Fiscalización
+                    </p>
+                )}
 
                 {error && (
                     <div className={`p-3 rounded-lg mb-4 text-sm ${error.includes('successful') ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>

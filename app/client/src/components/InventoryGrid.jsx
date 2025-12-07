@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Plus, Trash2, Save, X, Mail, Settings, Users } from 'lucide-react';
+import { Plus, Trash2, Save, X, Mail } from 'lucide-react';
 import clsx from 'clsx';
-import { ColumnManager } from './ColumnManager';
 import axios from 'axios';
 import { getUsers } from '../api';
 
@@ -45,22 +44,15 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
     const headerResizingRef = useRef(null);
     const headerHeightRef = useRef(headerHeight); // Keep ref in sync with state
 
-    // Validation state
+    // Validation state - only keep validUsers for validation
     const [validUsers, setValidUsers] = useState(null); // Map for validation
-    const [userRows, setUserRows] = useState([]); // Raw rows for display
-    const [userRoles, setUserRoles] = useState([]); // Role headers
-    const [showUserList, setShowUserList] = useState(false);
     const tableContainerRef = useRef(null);
 
-    // Load valid users for validation
+    // Load valid users for validation only
     useEffect(() => {
         const loadValidUsers = async () => {
             try {
                 const data = await getUsers();
-                // Store raw data for display
-                setUserRows(data.users || []);
-                setUserRoles(data.roles || []);
-
                 // Transform to map: Role -> Set of usernames for validation
                 const map = {};
                 if (data.roles && data.users) {
@@ -217,6 +209,12 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
     };
 
     const startAdd = () => {
+        // Check if user is valid before allowing add
+        if (!isUserValid()) {
+            alert('⚠️ Usuario no autorizado para agregar registros.\n\nSólo los usuarios dados de alta en usuarios.csv pueden agregar registros.');
+            return;
+        }
+
         // Scroll to top to ensure new row is visible
         if (tableContainerRef.current) {
             tableContainerRef.current.scrollTop = 0;
@@ -252,6 +250,18 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
 
     const handleChange = (colLabel, value) => {
         setEditForm(prev => ({ ...prev, [colLabel]: value }));
+    };
+
+    // Check if current user is valid (exists in usuarios.csv)
+    const isUserValid = () => {
+        if (!validUsers || !username) return false;
+        // Check if username exists in any role
+        for (const role in validUsers) {
+            if (validUsers[role].has(username)) {
+                return true;
+            }
+        }
+        return false;
     };
 
     const handleEmail = async (row) => {
@@ -346,57 +356,12 @@ Sistema de Inventario`;
 
     return (
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden shadow-xl relative">
-            {showUserList && (
-                <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-                    <div className="bg-zinc-800 border border-zinc-700 p-6 rounded-xl shadow-2xl max-w-4xl w-full max-h-[80vh] overflow-y-auto flex flex-col">
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                                <Users className="text-primary-400" />
-                                Usuarios Válidos Cargados
-                            </h2>
-                            <button onClick={() => setShowUserList(false)} className="text-zinc-400 hover:text-white transition-colors">
-                                <X size={24} />
-                            </button>
-                        </div>
-                        <div className="overflow-x-auto border border-zinc-700 rounded-lg">
-                            <table className="w-full text-sm text-left text-zinc-300">
-                                <thead className="text-xs text-zinc-100 uppercase bg-zinc-700 sticky top-0">
-                                    <tr>
-                                        {userRoles.map((role, i) => (
-                                            <th key={i} className="px-4 py-3 border-b border-zinc-600 font-semibold whitespace-nowrap">
-                                                {role}
-                                            </th>
-                                        ))}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {userRows.map((row, rowIndex) => (
-                                        <tr key={rowIndex} className="bg-zinc-800 border-b border-zinc-700 hover:bg-zinc-700/50">
-                                            {userRoles.map((_, colIndex) => (
-                                                <td key={colIndex} className="px-4 py-2 border-r border-zinc-700 last:border-r-0 whitespace-nowrap">
-                                                    {row[colIndex] || '-'}
-                                                </td>
-                                            ))}
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            )}
 
-            {showColManager && (
-                <ColumnManager
-                    columns={safeColumns}
-                    onClose={() => setShowColManager(false)}
-                    onUpdate={handleColumnUpdate}
-                />
-            )}
 
             <div className="p-3 border-b border-zinc-800 flex justify-between items-center bg-zinc-900/50">
                 <h3 className="font-semibold text-lg">
                     Records ({safeData.length})
+                    <span className="text-amber-400 text-sm ml-4 font-normal">Sólo se muestran los registros correspondientes al usuario que está logueado; los registros de otros usuarios no se muestran.</span>
                     <span className="text-zinc-400 text-sm ml-4 font-normal">Puedes modificar el ancho de las columnas a tu propia conveniencia</span>
                 </h3>
                 <div className="flex gap-2">
@@ -410,26 +375,11 @@ Sistema de Inventario`;
                             Save Layout
                         </button>
                     )}
-                    {role === 'ADMIN' && (
-                        <button
-                            onClick={() => setShowUserList(true)}
-                            className="flex items-center gap-2 px-4 py-2 bg-purple-700 hover:bg-purple-600 text-white rounded-lg transition-colors"
-                        >
-                            <Users size={18} />
-                            Ver Usuarios
-                        </button>
-                    )}
-                    <button
-                        onClick={() => setShowColManager(true)}
-                        className="flex items-center gap-2 px-4 py-2 bg-teal-700 hover:bg-teal-600 text-white rounded-lg transition-colors"
-                    >
-                        <Settings size={18} />
-                        Columns
-                    </button>
                     <button
                         onClick={startAdd}
-                        disabled={isAdding || editingId}
+                        disabled={isAdding || editingId || !isUserValid()}
                         className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        title={!isUserValid() ? "Usuario no autorizado para agregar registros" : "Agregar nuevo registro"}
                     >
                         <Plus size={18} />
                         Add Record
