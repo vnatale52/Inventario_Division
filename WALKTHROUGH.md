@@ -166,9 +166,10 @@ Features:
 
 **File**: [InventoryGrid.jsx](file:///c:/Users/vn/Desktop/Inventario%20Divisi%C3%B3n/app/client/src/components/InventoryGrid.jsx)
 
-- **User Existence Check**: When adding or editing records, the system validates that the values entered for user columns (INSPECTOR, SUPERVISOR, etc.) exactly match usage in `usuarios.csv`.
-- **Feedback**: If an invalid username is entered, an alert prevents saving and lists the valid options for that role.
-- **View Valid Users**: Admins have a new button "Ver Usuarios" to see a table of all valid users, organized by their role columns (INSPECTOR, SUPERVISOR, etc.) matching the CSV layout.
+- **User Existence Check**: When adding records, the system validates that the current user exists in `usuarios.csv`. This check is **case-insensitive** (e.g., 'Vincenzo' matches 'vincenzo') to prevent access issues.
+- **Admin Override**: Users with the `ADMIN` role can always add records, regardless of whether they are listed in the CSV file or not.
+- **Feedback**: If an invalid user tries to add a record, the button is disabled or an alert explains why access is denied.
+- **View Valid Users**: Admins can verify the list of valid users via the "Manage Users" interface.
 - **Auto-Increment**: New records automatically populate the `Orden` column with the next available number (Max + 1).
 
 ## Testing
