@@ -467,52 +467,41 @@ Sistema de Inventario`;
                                     <td className="px-4 py-3 border border-slate-500 bg-transparent">
                                         <div className="flex gap-2">
                                             {isEditing ? (
-                                                <>
-                                                    <button onClick={handleSave} className="text-green-400 hover:text-green-300" title="Save"><Save size={16} /></button>
-                                                    <button onClick={handleCancel} className="text-red-400 hover:text-red-300" title="Cancel"><X size={16} /></button>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <button onClick={() => handleEdit(row)} className="text-primary-400 hover:text-primary-300" title="Edit"><Settings size={14} /></button>
-                                                    <button onClick={() => handleEmail(row)} className="text-blue-400 hover:text-blue-300" title="Email"><Mail size={14} /></button>
-                                                    <button onClick={() => handleDelete(row)} className="text-zinc-500 hover:text-red-400" title="Delete"><Trash2 size={14} /></button>
-                                                </>
-                                            )}
-                                        </div>
-                                    </td>
-                                    {safeColumns.map((col, colIndex) => {
-                                        // Use stored value for Orden
-                                        let val = getValue(row, col.label);
+                                                {
+                                                    safeColumns.map((col, colIndex) => {
+                                                        // Use stored value for Orden
+                                                        let val = getValue(row, col.label);
 
-                                        return (
-                                            <td key={`cell-${row._id}-${col.id}-${colIndex}`} className={clsx("px-4 py-3 whitespace-nowrap border border-slate-500 overflow-hidden max-w-0", isFinancialColumn(col.label) && "text-right")}>
-                                                {isEditing ? (
-                                                    col.label === 'Orden' ? (
-                                                        // Display read-only order number in edit mode
-                                                        <span className="text-gray-700 text-xs truncate block" title={val}>
-                                                            {val}
-                                                        </span>
-                                                    ) : (
-                                                        <input
-                                                            className={clsx("bg-white border border-slate-600 rounded px-2 py-1 w-full text-gray-900 text-xs focus:outline-none focus:border-blue-700", isFinancialColumn(col.label) && "text-right")}
-                                                            value={editForm[col.label] || ''}
-                                                            onChange={(e) => handleChange(col.label, e.target.value)}
-                                                        />
-                                                    )
-                                                ) : (
-                                                    <span className={clsx("text-gray-900 text-xs truncate block w-full", isFinancialColumn(col.label) && "text-right")} title={val}>
-                                                        {val || '-'}
-                                                    </span>
-                                                )}
-                                            </td>
-                                        );
-                                    })}
+                                                        return (
+                                                            <td key={`cell-${row._id}-${col.id}-${colIndex}`} className={clsx("px-4 py-3 whitespace-nowrap border border-slate-500 overflow-hidden max-w-0", isFinancialColumn(col.label) && "text-right")}>
+                                                                {isEditing ? (
+                                                                    col.label === 'Orden' ? (
+                                                                        // Display read-only order number in edit mode
+                                                                        <span className="text-gray-700 text-xs truncate block" title={val}>
+                                                                            {val}
+                                                                        </span>
+                                                                    ) : (
+                                                                        <input
+                                                                            className={clsx("bg-white border border-slate-600 rounded px-2 py-1 w-full text-gray-900 text-xs focus:outline-none focus:border-blue-700", isFinancialColumn(col.label) && "text-right")}
+                                                                            value={editForm[col.label] || ''}
+                                                                            onChange={(e) => handleChange(col.label, e.target.value)}
+                                                                        />
+                                                                    )
+                                                                ) : (
+                                                                    <span className={clsx("text-gray-900 text-xs truncate block w-full", isFinancialColumn(col.label) && "text-right")} title={val}>
+                                                                        {val || '-'}
+                                                                    </span>
+                                                                )}
+                                                            </td>
+                                                        );
+                                                    })
+                                                }
                                 </tr>
-                            );
+                                        );
                         })}
-                    </tbody>
-                </table>
+                                    </tbody>
+                                </table>
             </div >
-        </div >
-    );
+            </div >
+            );
 };
