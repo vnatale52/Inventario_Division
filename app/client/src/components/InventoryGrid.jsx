@@ -57,7 +57,13 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
                 const map = {};
                 if (data.roles && data.users) {
                     data.roles.forEach((role, index) => {
-                        map[role] = new Set(data.users.map(row => row[index]).filter(u => u && u.trim() !== ''));
+                        // Store usernames in lowercase for case-insensitive comparison
+                        map[role] = new Set(
+                            data.users
+                                .map(row => row[index])
+                                .filter(u => u && u.trim() !== '')
+                                .map(u => u.trim().toLowerCase())
+                        );
                     });
                 }
                 setValidUsers(map);
@@ -175,6 +181,30 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
         document.addEventListener('mouseup', onMouseUp);
         document.body.style.cursor = 'row-resize';
     }, []);
+
+    const handleDelete = (row) => {
+        if (window.confirm('Are you sure you want to delete this record?')) {
+            onUpdate('DELETE', row);
+        }
+    };
+
+    // Check if current user is valid (exists in usuarios.csv) or is ADMIN
+    const isUserValid = () => {
+        // Admins are always allowed
+        if (role === 'ADMIN') return true;
+
+        if (!validUsers || !username) return false;
+
+        const lowerUsername = username.toLowerCase();
+
+        // Check if username exists in any role (case-insensitive)
+        for (const role in validUsers) {
+            if (validUsers[role] && validUsers[role].has(lowerUsername)) {
+                return true;
+            }
+        }
+        return false;
+    };
 
     const startAdd = () => {
         // Check if user is valid before allowing add
