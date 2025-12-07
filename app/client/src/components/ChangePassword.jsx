@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { X, Lock, Eye, EyeOff } from 'lucide-react';
 import { changePassword } from '../api';
 
-export default function ChangePassword({ onClose }) {
+export default function ChangePassword({ onClose, username }) {
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -55,7 +55,7 @@ export default function ChangePassword({ onClose }) {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-in fade-in duration-200">
             <div className="bg-zinc-800 border border-zinc-700 p-6 rounded-xl shadow-2xl max-w-md w-full">
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex justify-between items-center mb-2">
                     <h2 className="text-xl font-bold text-white flex items-center gap-2">
                         <Lock className="text-primary-400" />
                         Cambiar Contraseña
@@ -68,6 +68,9 @@ export default function ChangePassword({ onClose }) {
                         <X size={24} />
                     </button>
                 </div>
+                <p className="text-zinc-400 text-sm mb-6">
+                    Usuario: <span className="text-white font-medium">{username}</span>
+                </p>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {/* Current Password */}

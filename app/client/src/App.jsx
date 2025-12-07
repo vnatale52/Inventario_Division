@@ -155,7 +155,10 @@ function App() {
       )}
 
       {showChangePassword && (
-        <ChangePassword onClose={() => setShowChangePassword(false)} />
+        <ChangePassword
+          onClose={() => setShowChangePassword(false)}
+          username={user.username}
+        />
       )}
 
       <main>
