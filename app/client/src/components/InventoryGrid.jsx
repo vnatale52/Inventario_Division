@@ -176,53 +176,6 @@ export const InventoryGrid = ({ data, columns, onUpdate, role, username }) => {
         document.body.style.cursor = 'row-resize';
     }, []);
 
-    const handleSave = () => {
-        // Validation
-        if (validUsers) {
-            for (const [key, value] of Object.entries(editForm)) {
-                // If the column name matches a known Role and a value is entered
-                if (validUsers[key] && value && value.trim() !== '') {
-                    if (!validUsers[key].has(value.trim())) {
-                        alert(`Error: El usuario "${value}" no es válido para el rol ${key}.\n\nUsuarios válidos:\n${Array.from(validUsers[key]).join(', ')}`);
-                        return; // Stop save
-                    }
-                }
-            }
-        }
-
-        if (isAdding) {
-            onUpdate('ADD', editForm);
-            alert('✅ Registro agregado exitosamente');
-        } else {
-            onUpdate('UPDATE', editForm);
-            alert('✅ Registro actualizado exitosamente');
-        }
-        setEditingId(null);
-        setEditForm({});
-        setIsAdding(false);
-    };
-
-    const handleDelete = (row) => {
-        if (window.confirm('Are you sure you want to delete this record?')) {
-            onUpdate('DELETE', row);
-        }
-    };
-
-    // Check if current user is valid (exists in usuarios.csv) or is ADMIN
-    const isUserValid = () => {
-        // Admins are always allowed
-        if (role === 'ADMIN') return true;
-
-        if (!validUsers || !username) return false;
-        // Check if username exists in any role
-        for (const role in validUsers) {
-            if (validUsers[role].has(username)) {
-                return true;
-            }
-        }
-        return false;
-    };
-
     const startAdd = () => {
         // Check if user is valid before allowing add
         if (!isUserValid()) {
