@@ -4,12 +4,14 @@ import { fetchData, updateData, updateColumns, createBackup } from './api';
 import { InventoryGrid } from './components/InventoryGrid';
 import { Login } from './components/Login';
 import { UserManager } from './components/UserManager';
-import { Loader2 } from 'lucide-react';
+import ChangePassword from './components/ChangePassword';
+import { Loader2, Key } from 'lucide-react';
 
 function App() {
   const [user, setUser] = useState(null);
   const [loadingAuth, setLoadingAuth] = useState(true);
   const [showUserManager, setShowUserManager] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -95,6 +97,14 @@ function App() {
             </button>
           )}
           <button
+            onClick={() => setShowChangePassword(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-700 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm"
+            title="Change password"
+          >
+            <Key size={18} />
+            Cambiar Contraseña
+          </button>
+          <button
             onClick={async () => {
               try {
                 const response = await createBackup(user.username);
@@ -142,6 +152,10 @@ function App() {
 
       {showUserManager && (
         <UserManager onClose={() => setShowUserManager(false)} />
+      )}
+
+      {showChangePassword && (
+        <ChangePassword onClose={() => setShowChangePassword(false)} />
       )}
 
       <main>

@@ -54,3 +54,11 @@ export const saveUsers = async (data) => {
     const response = await api.post('/users', data);
     return response.data;
 };
+
+export const changePassword = async (currentPassword, newPassword) => {
+    const response = await api.post('/auth/change-password', {
+        currentPassword,
+        newPassword
+    });
+    return response.data;
+};
