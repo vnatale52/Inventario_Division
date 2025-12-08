@@ -17,7 +17,7 @@ Después de que Render cree los servicios, necesitas actualizar:
 
 Los siguientes archivos CSV deben estar en el repositorio (ya están):
 - ✅ `usuarios.csv` - Tabla de usuarios
-- ✅ `columnas.csv` - Definición de columnas
+- ✅ `columnas.csv` - Definición de columnas (Estructura: Numero Columna; Descripcion; Ancho)
 
 ### 3. Guía de Migración de Datos (100% Automática)
 
@@ -138,6 +138,8 @@ Mencionaste que ya creaste `inventory-db`. El **Blueprint** (`render.yaml`) est�
         - `inventory-backend` (Web Service)
         - `inventory-frontend` (Static Site)
     - Haz clic en el botón azul **"Apply"** (o "Create Blueprint").
+
+    > **Nota sobre Columnas:** El sistema detecta automáticamente la columna "Ancho" del archivo `columnas.csv`. Si realizas cambios en los anchos por defecto en el CSV, estos se aplicarán en el siguiente despliegue (respetando siempre las personalizaciones de los usuarios).
 
 4.  **Esperar Despliegue**:
     - Render comenzará a crear los servicios en orden.

@@ -159,22 +159,6 @@ El sistema **no tiene columnas hardcodeadas**.
 ---
 
 ## 7. Persistencia de Datos
-
-Una duda común es qué pasa con los archivos CSV cuando el servidor se reinicia o despliega.
-
-### ¿Mis datos se sobrescriben?
-**NO. Tus datos están seguros.**
-
-1. **Datos de Inventario (`Inventario.csv`)**:
-   - Este archivo es un **seed inicial**.
-   - El script de migración verifica si la base de datos ya tiene datos.
-   - Si la DB **ya tiene datos**, el script **se detiene**. Nunca sobrescribe producción.
-
-2. **Usuarios (`usuarios.csv`)**:
-   - Se usa para asegurar que los usuarios por defecto existan.
-   - Si creas usuarios nuevos via Web, se guardan en PostgreSQL (Persistente).
-   - El archivo CSV puede regenerarse via API, pero la fuente de verdad es la DB.
-
 ---
 
 ## 8. Guía de Despliegue en Render
