@@ -16,7 +16,8 @@ const initDB = async () => {
                 label TEXT NOT NULL,
                 type TEXT,
                 length TEXT,
-                required TEXT
+                required TEXT,
+                width INTEGER
             );
         `);
 

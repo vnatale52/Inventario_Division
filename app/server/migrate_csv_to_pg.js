@@ -37,14 +37,20 @@ const migrate = async () => {
             const colData = {
                 id: values[0],
                 label: values[1],
-                type: values[2],
-                length: values[3] || '',
-                required: values[4] || ''
+                width: parseInt(values[2]) || 100, // Default width if missing
+                type: values[3] || '', // Shifted due to new column structure? No, user said 3 headers: Num, Desc, Ancho. Wait.
+                // Re-reading user request: "Este archivo tiene los siguientes 3 headers: "Numero Columna"; "Descripcion" y "Ancho""
+                // This means the old "type", "length", "required" columns MIGHT BE GONE or shifted.
+                // Let's assume the file ONLY has these 3 based on description, OR they are appended.
+                // Checking the content of columns.csv viewed earlier:
+                // Line 1: Numero Columna;Descripcion;Ancho
+                // Line 2: 1;Orden;4
+                // It seems the other columns (type, length, required) ARE GONE.
             };
 
             await pool.query(
-                'INSERT INTO columns (column_id, label, type, length, required) VALUES ($1, $2, $3, $4, $5)',
-                [colData.id, colData.label, colData.type, colData.length, colData.required]
+                'INSERT INTO columns (column_id, label, width) VALUES ($1, $2, $3)',
+                [colData.id, colData.label, colData.width]
             );
         }
         console.log('Columns migrated successfully.');
